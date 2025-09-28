@@ -2,27 +2,22 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const crypto = require("crypto");
-const readline = require('readline');
 
-// Create readline interface for secure input
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-// Function to get secure input
-function askQuestion(question) {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer);
-    });
-  });
-}
-
-async function createPersonalAdmin() {
+async function createSecureAdmin() {
   console.log("🔐 Creating Your Personal Secure Admin Account");
   console.log("This will create a private admin account for you only.\n");
-  console.log("⚠️  Your email will NOT be saved in any file or pushed to GitHub!\n");
+  console.log("⚠️  Your email will be taken from environment variables - NEVER saved in code!\n");
+
+  // Get admin details from environment variables (SECURE METHOD)
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminName = process.env.ADMIN_NAME || "Site Owner";
+
+  if (!adminEmail) {
+    console.error("❌ Please set ADMIN_EMAIL environment variable");
+    console.error("Example: ADMIN_EMAIL='your@email.com' node src/createSecureAdmin.js");
+    console.error("This keeps your email completely private and secure!");
+    process.exit(1);
+  }
 
   const uri = process.env.MONGO_URI;
   if (!uri) {
@@ -34,22 +29,13 @@ async function createPersonalAdmin() {
     await mongoose.connect(uri);
     console.log("✅ Connected to MongoDB\n");
 
-    // Get admin details securely from user input (NOT from file)
-    console.log("📧 Please enter your admin details (kept private & secure):");
-    const adminEmail = await askQuestion("Enter your email address: ");
-    const adminName = await askQuestion("Enter your name (or leave blank for 'Site Owner'): ") || "Site Owner";
-    
     // Generate a secure random password
-    const securePassword =
-      crypto
-        .randomBytes(12)
-        .toString("base64")
-        .replace(/[^a-zA-Z0-9]/g, "") + "2024!";
+    const securePassword = crypto.randomBytes(16).toString('hex') + "2024!";
 
     // Your personal admin account (COMPLETELY PRIVATE!)
     const personalAdmin = {
       name: adminName,
-      email: adminEmail, // Entered privately, never saved to file
+      email: adminEmail, // From environment variable - never saved in file!
       password: securePassword,
       phone: "+234 000 000 0000",
       address: {
@@ -84,9 +70,9 @@ async function createPersonalAdmin() {
       console.log("═══════════════════════════════════════");
       console.log("⚠️  IMPORTANT SECURITY NOTES:");
       console.log("1. Save these credentials in a password manager");
-      console.log("2. Your email is kept private and NOT saved to any file");
+      console.log("2. Your email was taken from environment variable (100% secure!)");
       console.log("3. Never share these credentials publicly");
-      console.log("4. This information is only stored in your database");
+      console.log("4. Your email is NOT saved in any file or pushed to GitHub");
       console.log("═══════════════════════════════════════\n");
     }
 
@@ -96,27 +82,25 @@ async function createPersonalAdmin() {
       email: {
         $in: [
           "admin@codveda.com",
-          "superadmin@codveda.com",
+          "superadmin@codveda.com", 
           "admin@example.com",
+          "owner@yourcompany.com",
+          "test@private.com"
         ],
       },
     });
     console.log("✅ Test admin accounts removed for security\n");
 
     await mongoose.disconnect();
-    rl.close(); // Close readline interface
     console.log("✅ Database connection closed");
-    console.log(
-      "🔐 Your e-commerce site is now secure with your personal admin account!"
-    );
+    console.log("🔐 Your e-commerce site is now secure with your personal admin account!");
     console.log("🎯 Your email is completely private and will never be exposed on GitHub!");
 
     process.exit(0);
   } catch (err) {
     console.error("❌ Personal admin creation failed:", err);
-    rl.close(); // Make sure to close readline even on error
     process.exit(1);
   }
 }
 
-createPersonalAdmin();
+createSecureAdmin();
