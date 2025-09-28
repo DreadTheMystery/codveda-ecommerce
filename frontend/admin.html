@@ -25,6 +25,94 @@
             padding: 20px;
         }
 
+        /* Login Form Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #2c3e50;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #ff4757;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Admin Panel Styles */
+        .admin-panel {
+            display: none;
+        }
+
         .header {
             background: #2c3e50;
             color: white;
@@ -41,6 +129,10 @@
         .nav-links {
             text-align: center;
             margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
         }
 
         .nav-links a {
@@ -247,100 +339,58 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🛍️ Clothing Shop Admin Panel</h1>
-            <div class="nav-links">
-                <a href="index.html">View Store</a>
-                <a href="#add-product">Add Product</a>
-                <a href="#manage-products">Manage Products</a>
-            </div>
+    <!-- Login Form -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-form">
+            <h2>🔐 Admin Login</h2>
+            <div id="loginError" class="error-message" style="display: none;"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" id="loginBtn" class="login-btn">Login</button>
+            </form>
         </div>
+    </div>
 
-        <div id="message" class="message"></div>
-
-        <!-- Add Product Section -->
-        <div id="add-product" class="section">
-            <div class="section-header">➕ Add New Product</div>
-            <div class="section-content">
-                <form id="addProductForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="name">Product Name *</label>
-                            <input type="text" id="name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="price">Price (₦) *</label>
-                            <input type="number" id="price" name="price" required min="0" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="category">Category</label>
-                            <select id="category" name="category">
-                                <option value="">Select Category</option>
-                                <option value="T-Shirts">T-Shirts</option>
-                                <option value="Hoodies">Hoodies</option>
-                                <option value="Shoes">Shoes</option>
-                                <option value="Pants">Pants</option>
-                                <option value="Accessories">Accessories</option>
-                                <option value="Jackets">Jackets</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="stock">Stock Quantity</label>
-                            <input type="number" id="stock" name="stock" min="0" value="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" name="description" placeholder="Product description..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="image_url">Image URL</label>
-                        <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
-                    </div>
-                    <button type="submit" class="btn btn-success">Add Product</button>
-                    <button type="reset" class="btn">Clear Form</button>
-                </form>
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="container">
+            <div class="header">
+                <h1>🛍️ Clothing Shop Admin Panel</h1>
+                <div class="nav-links">
+                    <span id="adminGreeting"></span>
+                    <a href="index.html">View Store</a>
+                    <a href="#add-product">Add Product</a>
+                    <a href="#manage-products">Manage Products</a>
+                    <button id="logoutBtn" class="btn btn-danger" style="margin-left: 1rem;">Logout</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Manage Products Section -->
-        <div id="manage-products" class="section">
-            <div class="section-header">📦 Manage Products</div>
-            <div class="section-content">
-                <div class="loading" id="loading">Loading products...</div>
-                <table class="products-table" id="productsTable" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productsTableBody">
-                    </tbody>
-                </table>
+            <div id="message" class="message"></div>
 
-                <!-- Edit Product Form (Hidden by default) -->
-                <div id="editForm" class="edit-form">
-                    <h3>Edit Product</h3>
-                    <form id="editProductForm">
-                        <input type="hidden" id="editId" name="id">
+            <!-- Add Product Section -->
+            <div id="add-product" class="section">
+                <div class="section-header">➕ Add New Product</div>
+                <div class="section-content">
+                    <form id="addProductForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="editName">Product Name *</label>
-                                <input type="text" id="editName" name="name" required>
+                                <label for="name">Product Name *</label>
+                                <input type="text" id="name" name="name" required>
                             </div>
                             <div class="form-group">
-                                <label for="editPrice">Price (₦) *</label>
-                                <input type="number" id="editPrice" name="price" required min="0" step="0.01">
+                                <label for="price">Price (₦) *</label>
+                                <input type="number" id="price" name="price" required min="0" step="0.01">
                             </div>
                             <div class="form-group">
-                                <label for="editCategory">Category</label>
-                                <select id="editCategory" name="category">
+                                <label for="category">Category</label>
+                                <select id="category" name="category">
                                     <option value="">Select Category</option>
                                     <option value="T-Shirts">T-Shirts</option>
                                     <option value="Hoodies">Hoodies</option>
@@ -351,28 +401,206 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="editStock">Stock Quantity</label>
-                                <input type="number" id="editStock" name="stock" min="0">
+                                <label for="stock">Stock Quantity</label>
+                                <input type="number" id="stock" name="stock" min="0" value="0">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="editDescription">Description</label>
-                            <textarea id="editDescription" name="description"></textarea>
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description"
+                                placeholder="Product description..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="editImageUrl">Image URL</label>
-                            <input type="url" id="editImageUrl" name="image_url">
+                            <label for="image_url">Image URL</label>
+                            <input type="url" id="image_url" name="image_url"
+                                placeholder="https://example.com/image.jpg">
                         </div>
-                        <button type="submit" class="btn btn-warning">Update Product</button>
-                        <button type="button" class="btn" onclick="cancelEdit()">Cancel</button>
+                        <button type="submit" class="btn btn-success">Add Product</button>
+                        <button type="reset" class="btn">Clear Form</button>
                     </form>
                 </div>
             </div>
+
+            <!-- Manage Products Section -->
+            <div id="manage-products" class="section">
+                <div class="section-header">📦 Manage Products</div>
+                <div class="section-content">
+                    <div class="loading" id="loading">Loading products...</div>
+                    <table class="products-table" id="productsTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                        </tbody>
+                    </table>
+
+                    <!-- Edit Product Form (Hidden by default) -->
+                    <div id="editForm" class="edit-form">
+                        <h3>Edit Product</h3>
+                        <form id="editProductForm">
+                            <input type="hidden" id="editId" name="id">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="editName">Product Name *</label>
+                                    <input type="text" id="editName" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editPrice">Price (₦) *</label>
+                                    <input type="number" id="editPrice" name="price" required min="0" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editCategory">Category</label>
+                                    <select id="editCategory" name="category">
+                                        <option value="">Select Category</option>
+                                        <option value="T-Shirts">T-Shirts</option>
+                                        <option value="Hoodies">Hoodies</option>
+                                        <option value="Shoes">Shoes</option>
+                                        <option value="Pants">Pants</option>
+                                        <option value="Accessories">Accessories</option>
+                                        <option value="Jackets">Jackets</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="editStock">Stock Quantity</label>
+                                    <input type="number" id="editStock" name="stock" min="0">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="editDescription">Description</label>
+                                <textarea id="editDescription" name="description"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="editImageUrl">Image URL</label>
+                                <input type="url" id="editImageUrl" name="image_url">
+                            </div>
+                            <button type="submit" class="btn btn-warning">Update Product</button>
+                            <button type="button" class="btn" onclick="cancelEdit()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+
+    </div>
+    </div>
     </div>
 
     <script>
+        // Authentication variables
         const API_BASE = 'http://localhost:4000/api/products';
+        const AUTH_BASE = 'http://localhost:4000/api/auth';
+        let authToken = null;
+        let currentAdmin = null;
+
+        // Initialize authentication
+        function initAuth() {
+            authToken = localStorage.getItem('adminToken');
+            const adminData = localStorage.getItem('adminData');
+
+            if (authToken && adminData) {
+                currentAdmin = JSON.parse(adminData);
+                showAdminPanel();
+            } else {
+                showLoginForm();
+            }
+        }
+
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        // Show admin panel
+        function showAdminPanel() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+
+            if (currentAdmin) {
+                document.getElementById('adminGreeting').textContent = `Welcome, ${currentAdmin.name}!`;
+                loadProducts(); // Load products when admin panel is shown
+            }
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loginBtn = document.getElementById('loginBtn');
+            const loginError = document.getElementById('loginError');
+
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
+            loginError.style.display = 'none';
+
+            const formData = new FormData(e.target);
+            const loginData = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await fetch(`${AUTH_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Check if user is admin
+                    if (result.user.role !== 'admin') {
+                        loginError.textContent = 'Access denied. Admin privileges required.';
+                        loginError.style.display = 'block';
+                        return;
+                    }
+
+                    // Store auth data
+                    authToken = result.token;
+                    currentAdmin = result.user;
+                    localStorage.setItem('adminToken', authToken);
+                    localStorage.setItem('adminData', JSON.stringify(currentAdmin));
+
+                    showAdminPanel();
+                    e.target.reset();
+                } else {
+                    loginError.textContent = result.error || 'Login failed';
+                    loginError.style.display = 'block';
+                }
+            } catch (error) {
+                loginError.textContent = 'Network error. Please check if the server is running.';
+                loginError.style.display = 'block';
+            } finally {
+                loginBtn.textContent = 'Login';
+                loginBtn.disabled = false;
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminData');
+            authToken = null;
+            currentAdmin = null;
+            showLoginForm();
+        });
+
+        // Helper function to get auth headers
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            };
+        }
 
         // Show message function
         function showMessage(text, type = 'success') {
@@ -398,9 +626,7 @@
             try {
                 const response = await fetch(API_BASE, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(productData)
                 });
 
@@ -411,7 +637,12 @@
                     loadProducts(); // Refresh the products table
                 } else {
                     const error = await response.json();
-                    showMessage(error.error || 'Failed to add product', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        showMessage('Authentication failed. Please login again.', 'error');
+                        showLoginForm();
+                    } else {
+                        showMessage(error.error || 'Failed to add product', 'error');
+                    }
                 }
             } catch (error) {
                 showMessage('Network error. Please check if the server is running.', 'error');
@@ -512,9 +743,7 @@
             try {
                 const response = await fetch(`${API_BASE}/${productId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(productData)
                 });
 
@@ -525,7 +754,12 @@
                     loadProducts(); // Refresh the products table
                 } else {
                     const error = await response.json();
-                    showMessage(error.error || 'Failed to update product', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        showMessage('Authentication failed. Please login again.', 'error');
+                        showLoginForm();
+                    } else {
+                        showMessage(error.error || 'Failed to update product', 'error');
+                    }
                 }
             } catch (error) {
                 showMessage('Network error. Please check if the server is running.', 'error');
@@ -540,7 +774,8 @@
 
             try {
                 const response = await fetch(`${API_BASE}/${productId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
                 });
 
                 if (response.ok) {
@@ -548,15 +783,20 @@
                     loadProducts(); // Refresh the products table
                 } else {
                     const error = await response.json();
-                    showMessage(error.error || 'Failed to delete product', 'error');
+                    if (response.status === 401 || response.status === 403) {
+                        showMessage('Authentication failed. Please login again.', 'error');
+                        showLoginForm();
+                    } else {
+                        showMessage(error.error || 'Failed to delete product', 'error');
+                    }
                 }
             } catch (error) {
                 showMessage('Network error. Please check if the server is running.', 'error');
             }
         }
 
-        // Load products when page loads
-        document.addEventListener('DOMContentLoaded', loadProducts);
+        // Initialize authentication when page loads
+        document.addEventListener('DOMContentLoaded', initAuth);
 
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {

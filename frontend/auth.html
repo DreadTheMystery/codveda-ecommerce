@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CodVeda Clothing Shop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #764ba2;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .strength-weak {
+            color: #dc3545;
+        }
+
+        .strength-medium {
+            color: #ffc107;
+        }
+
+        .strength-strong {
+            color: #28a745;
+        }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .address-grid .form-group {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                margin: 10px;
+                padding: 2rem;
+            }
+
+            .address-grid {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="logo">
+            <h1>🛍️ CodVeda</h1>
+            <p>Welcome to our premium fashion store</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+            <button class="auth-tab" onclick="switchTab('register')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input type="email" id="loginEmail" required>
+                <div class="error-message" id="loginEmailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required>
+                <div class="error-message" id="loginPasswordError"></div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <div class="loading-spinner" id="loginSpinner"></div>
+                <span id="loginButtonText">Login</span>
+            </button>
+
+            <div class="error-message" id="loginFormError"></div>
+            <div class="success-message" id="loginFormSuccess"></div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="auth-form">
+            <div class="form-group">
+                <label for="registerName">Full Name</label>
+                <input type="text" id="registerName" required>
+                <div class="error-message" id="registerNameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="registerEmail">Email Address</label>
+                <input type="email" id="registerEmail" required>
+                <div class="error-message" id="registerEmailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="registerPassword">Password</label>
+                <input type="password" id="registerPassword" required minlength="6">
+                <div class="password-strength" id="passwordStrength"></div>
+                <div class="error-message" id="registerPasswordError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="registerPhone">Phone Number (Optional)</label>
+                <input type="tel" id="registerPhone" placeholder="+234 801 234 5678">
+            </div>
+
+            <div class="form-group">
+                <label>Address (Optional)</label>
+                <div class="address-grid">
+                    <div class="form-group">
+                        <input type="text" id="registerCity" placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="registerState" placeholder="State">
+                    </div>
+                </div>
+                <input type="text" id="registerStreet" placeholder="Street Address">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <div class="loading-spinner" id="registerSpinner"></div>
+                <span id="registerButtonText">Create Account</span>
+            </button>
+
+            <div class="error-message" id="registerFormError"></div>
+            <div class="success-message" id="registerFormSuccess"></div>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← Back to Store</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4000/api';
+
+        // Tab switching
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.auth-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update forms
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+
+            // Clear any error messages
+            clearMessages();
+        }
+
+        // Clear error/success messages
+        function clearMessages() {
+            document.querySelectorAll('.error-message, .success-message').forEach(msg => {
+                msg.style.display = 'none';
+                msg.textContent = '';
+            });
+            document.querySelectorAll('input').forEach(input => input.classList.remove('error'));
+        }
+
+        // Show error message
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        // Show success message
+        function showSuccess(elementId, message) {
+            const successEl = document.getElementById(elementId);
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+        }
+
+        // Password strength checker
+        document.getElementById('registerPassword').addEventListener('input', function () {
+            const password = this.value;
+            const strengthEl = document.getElementById('passwordStrength');
+
+            if (password.length === 0) {
+                strengthEl.textContent = '';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+            if (strength < 2) {
+                strengthEl.textContent = 'Weak password';
+                strengthEl.className = 'password-strength strength-weak';
+            } else if (strength < 3) {
+                strengthEl.textContent = 'Medium strength';
+                strengthEl.className = 'password-strength strength-medium';
+            } else {
+                strengthEl.textContent = 'Strong password';
+                strengthEl.className = 'password-strength strength-strong';
+            }
+        });
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Client-side validation
+            if (!email || !password) {
+                showError('loginFormError', 'Please fill in all fields');
+                return;
+            }
+
+            // Show loading
+            const spinner = document.getElementById('loginSpinner');
+            const buttonText = document.getElementById('loginButtonText');
+            const submitBtn = e.target.querySelector('.submit-btn');
+
+            spinner.style.display = 'inline-block';
+            buttonText.textContent = 'Logging in...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store user data and token
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+
+                    showSuccess('loginFormSuccess', 'Login successful! Redirecting...');
+
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
+                        window.location.href = returnUrl;
+                    }, 1500);
+                } else {
+                    showError('loginFormError', data.error || 'Login failed');
+                }
+            } catch (error) {
+                showError('loginFormError', 'Network error. Please check if the server is running.');
+            } finally {
+                spinner.style.display = 'none';
+                buttonText.textContent = 'Login';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const phone = document.getElementById('registerPhone').value;
+            const street = document.getElementById('registerStreet').value;
+            const city = document.getElementById('registerCity').value;
+            const state = document.getElementById('registerState').value;
+
+            // Client-side validation
+            if (!name || !email || !password) {
+                showError('registerFormError', 'Name, email, and password are required');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('registerPasswordError', 'Password must be at least 6 characters');
+                document.getElementById('registerPassword').classList.add('error');
+                return;
+            }
+
+            // Show loading
+            const spinner = document.getElementById('registerSpinner');
+            const buttonText = document.getElementById('registerButtonText');
+            const submitBtn = e.target.querySelector('.submit-btn');
+
+            spinner.style.display = 'inline-block';
+            buttonText.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+
+            // Prepare user data
+            const userData = { name, email, password };
+            if (phone) userData.phone = phone;
+            if (street || city || state) {
+                userData.address = {};
+                if (street) userData.address.street = street;
+                if (city) userData.address.city = city;
+                if (state) userData.address.state = state;
+                userData.address.country = 'Nigeria';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store user data and token
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userData', JSON.stringify(data.user));
+
+                    showSuccess('registerFormSuccess', 'Account created successfully! Redirecting...');
+
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
+                        window.location.href = returnUrl;
+                    }, 1500);
+                } else {
+                    showError('registerFormError', data.error || 'Registration failed');
+                }
+            } catch (error) {
+                showError('registerFormError', 'Network error. Please check if the server is running.');
+            } finally {
+                spinner.style.display = 'none';
+                buttonText.textContent = 'Create Account';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // User is already logged in, redirect to home
+                const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
+                window.location.href = returnUrl;
+            }
+        });
+    </script>
+</body>
+
+</html>

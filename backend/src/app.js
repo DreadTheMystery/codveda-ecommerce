@@ -3,6 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const productsRouter = require("./routes/products");
+const authRouter = require("./routes/auth");
+const ordersRouter = require("./routes/orders");
 const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
@@ -13,9 +15,16 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) =>
-  res.json({ ok: true, message: "Clothing Shop API (Level 1) - MongoDB" })
+  res.json({
+    ok: true,
+    message: "CodVeda Clothing Shop API - Full-Stack E-commerce",
+  })
 );
+
+// API routes
 app.use("/api/products", productsRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/orders", ordersRouter);
 
 // error handler
 app.use(errorHandler);

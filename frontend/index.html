@@ -437,6 +437,19 @@
                     <a href="#products" class="nav-link">Products</a>
                     <a href="#" class="nav-link">About</a>
                     <a href="#" class="nav-link">Contact</a>
+
+                    <!-- Guest Links (not logged in) -->
+                    <div id="guestLinks" style="display: flex; gap: 1rem;">
+                        <a href="auth.html" class="nav-link">Login</a>
+                    </div>
+
+                    <!-- User Links (logged in) -->
+                    <div id="userLinks" style="display: none; gap: 1rem;">
+                        <span id="userGreeting" class="nav-link"></span>
+                        <a href="#" id="ordersLink" class="nav-link">My Orders</a>
+                        <a href="#" id="logoutLink" class="nav-link">Logout</a>
+                    </div>
+
                     <a href="admin.html" class="admin-link">🔧 Admin Panel</a>
                 </div>
             </nav>
@@ -552,8 +565,8 @@
                                 ${p.stock < 1 ? '❌ Out of Stock' : p.stock < 5 ? `⚠️ Only ${p.stock} left` : `✅ ${p.stock} in stock`}
                             </div>
                         </div>
-                        <button class="add-to-cart" ${p.stock < 1 ? 'disabled' : ''} onclick="addToCart('${p._id}')">
-                            ${p.stock < 1 ? '❌ Out of Stock' : '🛒 Add to Cart'}
+                        <button class="add-to-cart" ${p.stock < 1 ? 'disabled' : ''} onclick="orderProduct('${p._id}')">
+                            ${p.stock < 1 ? '❌ Out of Stock' : '� Order Now'}
                         </button>
                     </div>
                 </div>
@@ -581,24 +594,458 @@
             displayProducts(filteredProducts);
         }
 
-        function addToCart(productId) {
-            // Find the product
-            const product = allProducts.find(p => p._id === productId);
-            if (!product) return;
+        // Authentication and User Management
+        const API_BASE = 'http://localhost:4000/api';
+        let currentUser = null;
+        let authToken = null;
 
-            // Show success message (you can enhance this later)
-            showNotification(`Added "${product.name}" to cart! 🛒`);
+        // Initialize authentication state
+        function initAuth() {
+            authToken = localStorage.getItem('authToken');
+            const userData = localStorage.getItem('userData');
+
+            if (authToken && userData) {
+                currentUser = JSON.parse(userData);
+                updateUIForLoggedInUser();
+            } else {
+                updateUIForGuest();
+            }
         }
 
-        function showNotification(message) {
+        // Update UI for logged in user
+        function updateUIForLoggedInUser() {
+            document.getElementById('guestLinks').style.display = 'none';
+            document.getElementById('userLinks').style.display = 'flex';
+            document.getElementById('userGreeting').textContent = `Hi, ${currentUser.name}!`;
+        }
+
+        // Update UI for guest user
+        function updateUIForGuest() {
+            document.getElementById('guestLinks').style.display = 'flex';
+            document.getElementById('userLinks').style.display = 'none';
+        }
+
+        // Logout function
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            logout();
+        });
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            currentUser = null;
+            authToken = null;
+            updateUIForGuest();
+            showNotification('Logged out successfully');
+        }
+
+        // Order Product Function (replaces addToCart)
+        function orderProduct(productId) {
+            // Check if user is logged in
+            if (!authToken || !currentUser) {
+                // Redirect to auth page with return URL
+                showNotification('Please login to place an order', 'info');
+                setTimeout(() => {
+                    window.location.href = `auth.html?return=${encodeURIComponent(window.location.href)}`;
+                }, 1500);
+                return;
+            }
+
+            // Find the product
+            const product = allProducts.find(p => p._id === productId);
+            if (!product) {
+                showNotification('Product not found', 'error');
+                return;
+            }
+
+            if (product.stock < 1) {
+                showNotification('Product is out of stock', 'error');
+                return;
+            }
+
+            // Show order confirmation dialog
+            showOrderConfirmation(product);
+        }
+
+        // Show order confirmation modal
+        function showOrderConfirmation(product) {
+            const modal = document.createElement('div');
+            modal.id = 'orderModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    border-radius: 20px;
+                    padding: 2rem;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    position: relative;
+                ">
+                    <button onclick="closeOrderModal()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        color: #666;
+                    ">&times;</button>
+                    
+                    <h2 style="margin-bottom: 1rem; color: #2c3e50;">Confirm Your Order</h2>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <img src="${product.image_url}" alt="${product.name}" style="
+                            width: 100px;
+                            height: 100px;
+                            object-fit: cover;
+                            border-radius: 10px;
+                        ">
+                        <div>
+                            <h3 style="margin-bottom: 0.5rem;">${product.name}</h3>
+                            <p style="color: #666; margin-bottom: 0.5rem;">${product.description || 'No description'}</p>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #667eea;">₦${parseInt(product.price).toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Quantity:</label>
+                        <select id="orderQuantity" style="
+                            width: 100px;
+                            padding: 0.5rem;
+                            border: 2px solid #e9ecef;
+                            border-radius: 5px;
+                        ">
+                            ${Array.from({ length: Math.min(product.stock, 10) }, (_, i) =>
+                `<option value="${i + 1}">${i + 1}</option>`
+            ).join('')}
+                        </select>
+                        <span style="margin-left: 1rem; color: #666;">${product.stock} available</span>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 1rem;">Shipping Address:</h4>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px;">
+                            <input type="text" id="shippingName" placeholder="Full Name" value="${currentUser.name}" style="
+                                width: 100%;
+                                padding: 0.5rem;
+                                margin-bottom: 0.5rem;
+                                border: 1px solid #ddd;
+                                border-radius: 5px;
+                            ">
+                            <input type="tel" id="shippingPhone" placeholder="Phone Number" value="${currentUser.phone || ''}" style="
+                                width: 100%;
+                                padding: 0.5rem;
+                                margin-bottom: 0.5rem;
+                                border: 1px solid #ddd;
+                                border-radius: 5px;
+                            ">
+                            <input type="text" id="shippingStreet" placeholder="Street Address" value="${currentUser.address?.street || ''}" style="
+                                width: 100%;
+                                padding: 0.5rem;
+                                margin-bottom: 0.5rem;
+                                border: 1px solid #ddd;
+                                border-radius: 5px;
+                            ">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input type="text" id="shippingCity" placeholder="City" value="${currentUser.address?.city || ''}" style="
+                                    flex: 1;
+                                    padding: 0.5rem;
+                                    border: 1px solid #ddd;
+                                    border-radius: 5px;
+                                ">
+                                <input type="text" id="shippingState" placeholder="State" value="${currentUser.address?.state || ''}" style="
+                                    flex: 1;
+                                    padding: 0.5rem;
+                                    border: 1px solid #ddd;
+                                    border-radius: 5px;
+                                ">
+                                <input type="text" id="shippingZip" placeholder="ZIP Code" value="${currentUser.address?.zipCode || ''}" style="
+                                    width: 100px;
+                                    padding: 0.5rem;
+                                    border: 1px solid #ddd;
+                                    border-radius: 5px;
+                                ">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Payment Method:</label>
+                        <select id="paymentMethod" style="
+                            width: 100%;
+                            padding: 0.5rem;
+                            border: 2px solid #e9ecef;
+                            border-radius: 5px;
+                        ">
+                            <option value="cash_on_delivery">Cash on Delivery</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="card">Card Payment</option>
+                        </select>
+                    </div>
+
+                    <textarea id="orderNotes" placeholder="Special instructions (optional)" style="
+                        width: 100%;
+                        padding: 0.75rem;
+                        border: 2px solid #e9ecef;
+                        border-radius: 10px;
+                        margin-bottom: 1.5rem;
+                        min-height: 80px;
+                        resize: vertical;
+                    "></textarea>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button onclick="closeOrderModal()" style="
+                            flex: 1;
+                            padding: 1rem;
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            border-radius: 10px;
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button onclick="submitOrder('${product._id}')" style="
+                            flex: 2;
+                            padding: 1rem;
+                            background: linear-gradient(45deg, #28a745, #20c997);
+                            color: white;
+                            border: none;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            font-weight: 600;
+                        ">Place Order</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        // Close order modal
+        function closeOrderModal() {
+            const modal = document.getElementById('orderModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Submit order
+        async function submitOrder(productId) {
+            const quantity = parseInt(document.getElementById('orderQuantity').value);
+            const shippingName = document.getElementById('shippingName').value;
+            const shippingPhone = document.getElementById('shippingPhone').value;
+            const shippingStreet = document.getElementById('shippingStreet').value;
+            const shippingCity = document.getElementById('shippingCity').value;
+            const shippingState = document.getElementById('shippingState').value;
+            const shippingZip = document.getElementById('shippingZip').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const notes = document.getElementById('orderNotes').value;
+
+            // Validation
+            if (!shippingName || !shippingPhone || !shippingStreet || !shippingCity || !shippingState) {
+                showNotification('Please fill in all required shipping information', 'error');
+                return;
+            }
+
+            // Show loading
+            const submitBtn = event.target;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Placing Order...';
+            submitBtn.disabled = true;
+
+            try {
+                const orderData = {
+                    items: [{
+                        product: productId,
+                        quantity: quantity
+                    }],
+                    shippingAddress: {
+                        name: shippingName,
+                        phone: shippingPhone,
+                        street: shippingStreet,
+                        city: shippingCity,
+                        state: shippingState,
+                        zipCode: shippingZip
+                    },
+                    paymentMethod: paymentMethod,
+                    notes: notes
+                };
+
+                const response = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    closeOrderModal();
+                    showNotification(`Order placed successfully! Order #${result.order.orderNumber}`, 'success');
+                    // Refresh products to update stock
+                    loadProducts();
+                } else {
+                    showNotification(result.error || 'Failed to place order', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error. Please try again.', 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // My Orders functionality
+        document.getElementById('ordersLink').addEventListener('click', async function (e) {
+            e.preventDefault();
+            await showMyOrders();
+        });
+
+        async function showMyOrders() {
+            try {
+                const response = await fetch(`${API_BASE}/orders/my-orders`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showOrdersModal(result.orders);
+                } else {
+                    showNotification('Failed to load orders', 'error');
+                }
+            } catch (error) {
+                showNotification('Network error', 'error');
+            }
+        }
+
+        function showOrdersModal(orders) {
+            const modal = document.createElement('div');
+            modal.id = 'ordersModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            const ordersHtml = orders.length === 0 ?
+                '<p style="text-align: center; color: #666;">No orders yet. Start shopping!</p>' :
+                orders.map(order => `
+                    <div style="
+                        border: 1px solid #e9ecef;
+                        border-radius: 10px;
+                        padding: 1rem;
+                        margin-bottom: 1rem;
+                    ">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                            <strong>Order #${order.orderNumber}</strong>
+                            <span style="
+                                padding: 0.25rem 0.75rem;
+                                border-radius: 15px;
+                                font-size: 0.8rem;
+                                background: ${order.status === 'pending' ? '#ffc107' :
+                        order.status === 'processing' ? '#17a2b8' :
+                            order.status === 'shipped' ? '#007bff' :
+                                order.status === 'delivered' ? '#28a745' : '#dc3545'};
+                                color: white;
+                            ">${order.status.toUpperCase()}</span>
+                        </div>
+                        <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            ${new Date(order.createdAt).toLocaleDateString()}
+                        </div>
+                        <div>
+                            ${order.items.map(item =>
+                                    `<div style="display: flex; justify-content: between;">
+                                    <span>${item.name} x${item.quantity}</span>
+                                    <span>₦${(item.price * item.quantity).toLocaleString()}</span>
+                                </div>`
+                                ).join('')}
+                        </div>
+                        <div style="text-align: right; font-weight: bold; margin-top: 0.5rem; border-top: 1px solid #eee; padding-top: 0.5rem;">
+                            Total: ₦${order.totalAmount.toLocaleString()}
+                        </div>
+                    </div>
+                `).join('');
+
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    border-radius: 20px;
+                    padding: 2rem;
+                    max-width: 600px;
+                    width: 90%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    position: relative;
+                ">
+                    <button onclick="closeOrdersModal()" style="
+                        position: absolute;
+                        top: 1rem;
+                        right: 1rem;
+                        background: none;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        color: #666;
+                    ">&times;</button>
+                    
+                    <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">My Orders</h2>
+                    ${ordersHtml}
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        function closeOrdersModal() {
+            const modal = document.getElementById('ordersModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function showNotification(message, type = 'success') {
             // Create notification element
             const notification = document.createElement('div');
+            const backgroundColor = type === 'error' ? 'linear-gradient(45deg, #dc3545, #c82333)' :
+                type === 'info' ? 'linear-gradient(45deg, #17a2b8, #138496)' :
+                    'linear-gradient(45deg, #28a745, #20c997)';
+
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: linear-gradient(45deg, #28a745, #20c997);
+                background: ${backgroundColor};
                 color: white;
                 padding: 1rem 2rem;
                 border-radius: 50px;
@@ -609,7 +1056,7 @@
             `;
             notification.textContent = message;
 
-            // Add animation keyframes
+            // Add animation keyframes if not exists
             if (!document.querySelector('#notification-styles')) {
                 const style = document.createElement('style');
                 style.id = 'notification-styles';
@@ -676,6 +1123,12 @@
             }
         `;
         document.head.appendChild(animationStyles);
+
+        // Initialize authentication and load products
+        document.addEventListener('DOMContentLoaded', function () {
+            initAuth();
+            loadProducts();
+        });
     </script>
 </body>
 

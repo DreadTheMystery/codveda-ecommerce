@@ -5,6 +5,7 @@ A modern, full-stack e-commerce application built with Node.js, Express, MongoDB
 ## 🚀 Features
 
 ### 🎯 Customer Features
+
 - **Modern UI/UX**: Beautiful gradient design with smooth animations
 - **Responsive Design**: Perfect experience on desktop, tablet, and mobile
 - **Product Browsing**: Grid layout with 3 products per line (responsive)
@@ -14,6 +15,7 @@ A modern, full-stack e-commerce application built with Node.js, Express, MongoDB
 - **Stock Awareness**: Real-time stock status (In Stock, Low Stock, Out of Stock)
 
 ### 🔧 Admin Features
+
 - **Complete CRUD Operations**: Create, Read, Update, Delete products
 - **User-Friendly Interface**: Professional admin panel with intuitive forms
 - **Product Management**: Manage all product details including images, categories, stock
@@ -25,6 +27,7 @@ A modern, full-stack e-commerce application built with Node.js, Express, MongoDB
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Node.js** - Runtime environment
 - **Express.js** - Web application framework
 - **MongoDB** - NoSQL database
@@ -33,12 +36,14 @@ A modern, full-stack e-commerce application built with Node.js, Express, MongoDB
 - **dotenv** - Environment variable management
 
 ### Frontend
+
 - **HTML5** - Semantic markup
 - **CSS3** - Modern styling with gradients, animations, and responsive design
 - **Vanilla JavaScript** - Interactive functionality
 - **Fetch API** - HTTP requests to backend
 
 ### Database
+
 - **MongoDB Atlas** - Cloud database service
 - **Collections**: Products with full schema validation
 
@@ -71,6 +76,7 @@ codveda-ecommerce/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js (v14 or higher)
 - MongoDB Atlas account (or local MongoDB)
 - Git
@@ -78,38 +84,44 @@ codveda-ecommerce/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/DreadTheMystery/codveda-ecommerce.git
    cd codveda-ecommerce
    ```
 
 2. **Install dependencies**
+
    ```bash
    cd backend
    npm install
    ```
 
 3. **Environment Setup**
+
    ```bash
    # Copy the environment template
    cp .env.example .env
-   
+
    # Edit .env with your MongoDB connection string
    nano .env
    ```
 
 4. **Configure your .env file**
+
    ```env
    PORT=4000
    MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/clothing_shop_db?retryWrites=true&w=majority
    ```
 
 5. **Seed the database**
+
    ```bash
    npm run seed
    ```
 
 6. **Start the development server**
+
    ```bash
    npm run dev
    ```
@@ -123,14 +135,14 @@ codveda-ecommerce/
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/` | Health check |
-| GET | `/api/products` | Get all products |
-| GET | `/api/products/:id` | Get single product |
-| POST | `/api/products` | Create new product |
-| PUT | `/api/products/:id` | Update product |
-| DELETE | `/api/products/:id` | Delete product |
+| Method | Endpoint            | Description        |
+| ------ | ------------------- | ------------------ |
+| GET    | `/`                 | Health check       |
+| GET    | `/api/products`     | Get all products   |
+| GET    | `/api/products/:id` | Get single product |
+| POST   | `/api/products`     | Create new product |
+| PUT    | `/api/products/:id` | Update product     |
+| DELETE | `/api/products/:id` | Delete product     |
 
 ### Product Schema
 
@@ -150,6 +162,7 @@ codveda-ecommerce/
 ### Example API Usage
 
 **Create a product:**
+
 ```bash
 curl -X POST http://localhost:4000/api/products \
   -H "Content-Type: application/json" \
@@ -166,6 +179,7 @@ curl -X POST http://localhost:4000/api/products \
 ## 🎨 Design Features
 
 ### Visual Design
+
 - **Gradient Backgrounds**: Modern purple gradient theme
 - **Glass Morphism**: Frosted glass effects on navigation
 - **Smooth Animations**: Hover effects and transitions
@@ -173,6 +187,7 @@ curl -X POST http://localhost:4000/api/products \
 - **Responsive Grid**: 3-column desktop, 2-column tablet, 1-column mobile
 
 ### User Experience
+
 - **Loading States**: Visual feedback during data fetching
 - **Error Handling**: User-friendly error messages
 - **Success Notifications**: Confirmation for user actions
@@ -189,11 +204,13 @@ curl -X POST http://localhost:4000/api/products \
 ## 🚀 Deployment
 
 ### Backend Deployment (Heroku, Railway, etc.)
+
 1. Set environment variables in your hosting platform
 2. Deploy the `backend` folder
 3. Update frontend API endpoints to production URL
 
 ### Frontend Deployment (Netlify, Vercel, etc.)
+
 1. Deploy the `frontend` folder
 2. Update API base URL in JavaScript files
 3. Configure CORS on backend for production domain
@@ -226,6 +243,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **DreadTheMystery**
+
 - GitHub: [@DreadTheMystery](https://github.com/DreadTheMystery)
 
 ## 🙏 Acknowledgments
