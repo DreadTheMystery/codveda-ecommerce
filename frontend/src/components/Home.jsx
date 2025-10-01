@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./Home.css";
 import NotificationSystem from "./NotificationSystem";
 import { useCart } from "../context/CartContext";
+import { getProductImageUrl, handleImageError } from "../config/images";
 
 const Home = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -11,7 +12,11 @@ const Home = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const { addToCart: addToCartContext, getTotalItems, getItemQuantity } = useCart();
+  const {
+    addToCart: addToCartContext,
+    getTotalItems,
+    getItemQuantity,
+  } = useCart();
 
   useEffect(() => {
     initAuth();
@@ -94,7 +99,7 @@ const Home = () => {
 
     // Check if adding one more would exceed stock
     const currentQuantity = getItemQuantity(product._id);
-    
+
     if (currentQuantity >= product.stock) {
       showNotification(
         `Cannot add more items. Only ${product.stock} available in stock`,
@@ -147,8 +152,6 @@ const Home = () => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
-
-
   const filteredProducts = getFilteredProducts();
 
   return (
@@ -181,10 +184,14 @@ const Home = () => {
               )}
 
               {/* Cart Link */}
-              <Link to="/cart" className="nav-link" style={{ position: "relative" }}>
+              <Link
+                to="/cart"
+                className="nav-link"
+                style={{ position: "relative" }}
+              >
                 🛒 Cart
                 {getTotalItems() > 0 && (
-                  <span 
+                  <span
                     style={{
                       position: "absolute",
                       top: "-8px",
@@ -197,7 +204,7 @@ const Home = () => {
                       fontWeight: "bold",
                       minWidth: "18px",
                       textAlign: "center",
-                      lineHeight: "14px"
+                      lineHeight: "14px",
                     }}
                   >
                     {getTotalItems()}
@@ -224,10 +231,6 @@ const Home = () => {
                   </a>
                 </div>
               )}
-
-              <Link to="/admin" className="admin-link">
-                🔧 Admin Panel
-              </Link>
             </div>
           </nav>
         </div>
@@ -316,13 +319,6 @@ const Home = () => {
                   Our store is being stocked with amazing products. Check back
                   soon!
                 </p>
-                <Link
-                  to="/admin"
-                  className="cta-button"
-                  style={{ marginTop: "1rem" }}
-                >
-                  Add Products
-                </Link>
               </div>
             )}
 
@@ -335,11 +331,10 @@ const Home = () => {
                 >
                   <div className="card-image">
                     <img
-                      src={
-                        product.image_url ||
-                        "https://via.placeholder.com/400x300?text=No+Image"
-                      }
+                      src={getProductImageUrl(product.image_url)}
                       alt={product.name}
+                      onError={handleImageError}
+                      loading="lazy"
                     />
                     <div className="card-badge">
                       {product.category || "New"}

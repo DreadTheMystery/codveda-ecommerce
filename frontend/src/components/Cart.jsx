@@ -1,20 +1,28 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import NotificationSystem from './NotificationSystem';
-import './Cart.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import NotificationSystem from "./NotificationSystem";
+import { formatOrderMessage, createWhatsAppUrl } from "../config/whatsapp";
+import "./Cart.css";
 
 const Cart = () => {
-  const { cart, updateQuantity, removeFromCart, clearCart, getTotalItems, getTotalPrice } = useCart();
+  const {
+    cart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    getTotalItems,
+    getTotalPrice,
+  } = useCart();
   const [notifications, setNotifications] = useState([]);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [shippingAddress, setShippingAddress] = useState({
-    name: '',
-    phone: '',
-    street: '',
-    city: '',
-    state: '',
-    zipCode: ''
+    name: "",
+    phone: "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
   });
 
   // Notification functions
@@ -24,31 +32,37 @@ const Cart = () => {
       title: title || getNotificationTitle(type),
       message,
       type,
-      duration: type === 'error' ? 7000 : 5000
+      duration: type === "error" ? 7000 : 5000,
     };
-    setNotifications(prev => [...prev, notification]);
+    setNotifications((prev) => [...prev, notification]);
   };
 
   const getNotificationTitle = (type) => {
     switch (type) {
-      case 'success': return 'Success!';
-      case 'error': return 'Error';
-      case 'warning': return 'Warning';
-      case 'info': return 'Info';
-      case 'order': return 'Order Update';
-      default: return 'Notification';
+      case "success":
+        return "Success!";
+      case "error":
+        return "Error";
+      case "warning":
+        return "Warning";
+      case "info":
+        return "Info";
+      case "order":
+        return "Order Update";
+      default:
+        return "Notification";
     }
   };
 
   const removeNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   // Handle quantity changes
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity < 1) {
       removeFromCart(productId);
-      showNotification('Item removed from cart', 'info', '🗑️ Item Removed');
+      showNotification("Item removed from cart", "info", "🗑️ Item Removed");
     } else {
       updateQuantity(productId, newQuantity);
     }
@@ -57,14 +71,18 @@ const Cart = () => {
   // Handle remove item
   const handleRemoveItem = (productId, productName) => {
     removeFromCart(productId);
-    showNotification(`${productName} removed from cart`, 'info', '🗑️ Item Removed');
+    showNotification(
+      `${productName} removed from cart`,
+      "info",
+      "🗑️ Item Removed"
+    );
   };
 
   // Handle clear cart
   const handleClearCart = () => {
-    if (window.confirm('Are you sure you want to clear your cart?')) {
+    if (window.confirm("Are you sure you want to clear your cart?")) {
       clearCart();
-      showNotification('Cart cleared successfully', 'info', '🧹 Cart Cleared');
+      showNotification("Cart cleared successfully", "info", "🧹 Cart Cleared");
     }
   };
 
@@ -72,48 +90,101 @@ const Cart = () => {
   const handleAddressChange = (e) => {
     setShippingAddress({
       ...shippingAddress,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  // WhatsApp redirect function
+  const redirectToWhatsApp = (order, shippingAddress) => {
+    // Create order summary message
+    const orderItems = cart.items
+      .map(
+        (item) =>
+          `• ${item.product.name} (₦${parseInt(
+            item.product.price
+          ).toLocaleString()}) x ${item.quantity} = ₦${(
+            item.product.price * item.quantity
+          ).toLocaleString()}`
+      )
+      .join("\n");
+
+    const totalAmount = getTotalPrice();
+
+    // Use the configuration to format message and create URL
+    const message = formatOrderMessage(
+      order,
+      shippingAddress,
+      orderItems,
+      totalAmount
+    );
+    const whatsappUrl = createWhatsAppUrl(message);
+
+    // Show notification about redirect
+    showNotification(
+      "Redirecting to WhatsApp for payment confirmation...",
+      "info",
+      "📱 WhatsApp Payment"
+    );
+
+    // Redirect after a short delay to allow notification to show
+    setTimeout(() => {
+      window.open(whatsappUrl, "_blank");
+    }, 2000);
   };
 
   // Handle place order
   const handlePlaceOrder = async () => {
     // Validate shipping address
-    if (!shippingAddress.name || !shippingAddress.phone || !shippingAddress.street || !shippingAddress.city) {
-      showNotification('Please fill in all required shipping details', 'warning', '📋 Missing Information');
+    if (
+      !shippingAddress.name ||
+      !shippingAddress.phone ||
+      !shippingAddress.street ||
+      !shippingAddress.city
+    ) {
+      showNotification(
+        "Please fill in all required shipping details",
+        "warning",
+        "📋 Missing Information"
+      );
       return;
     }
 
     // Check authentication
-    const authToken = localStorage.getItem('authToken');
+    const authToken = localStorage.getItem("authToken");
     if (!authToken) {
-      showNotification('Please login to place your order', 'info', '🔐 Login Required');
+      showNotification(
+        "Please login to place your order",
+        "info",
+        "🔐 Login Required"
+      );
       setTimeout(() => {
-        window.location.href = `/auth?return=${encodeURIComponent(window.location.href)}`;
+        window.location.href = `/auth?return=${encodeURIComponent(
+          window.location.href
+        )}`;
       }, 1500);
       return;
     }
 
     setIsProcessingOrder(true);
-    showNotification('Processing your order...', 'info', '🚀 Order Processing');
+    showNotification("Processing your order...", "info", "🚀 Order Processing");
 
     try {
       const orderData = {
-        items: cart.items.map(item => ({
+        items: cart.items.map((item) => ({
           product: item.product._id,
-          quantity: item.quantity
+          quantity: item.quantity,
         })),
         shippingAddress,
-        paymentMethod: 'cash_on_delivery'
+        paymentMethod: "cash_on_delivery",
       };
 
-      const response = await fetch('http://localhost:4000/api/orders', {
-        method: 'POST',
+      const response = await fetch("http://localhost:4000/api/orders", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(orderData),
       });
 
       const result = await response.json();
@@ -121,19 +192,28 @@ const Cart = () => {
       if (response.ok) {
         showNotification(
           `Order placed successfully! Order #${result.order.orderNumber}`,
-          'order',
-          '🎉 Order Confirmed!'
+          "order",
+          "🎉 Order Confirmed!"
         );
+
+        // Redirect to WhatsApp for payment
+        redirectToWhatsApp(result.order, shippingAddress);
+
         clearCart();
         // Reset shipping address
         setShippingAddress({
-          name: '', phone: '', street: '', city: '', state: '', zipCode: ''
+          name: "",
+          phone: "",
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
         });
       } else {
-        showNotification(result.error || 'Failed to place order', 'error');
+        showNotification(result.error || "Failed to place order", "error");
       }
     } catch (error) {
-      showNotification('Network error. Please try again.', 'error');
+      showNotification("Network error. Please try again.", "error");
     } finally {
       setIsProcessingOrder(false);
     }
@@ -145,20 +225,24 @@ const Cart = () => {
         <div className="container">
           <div className="cart-header">
             <h1>🛒 Your Shopping Cart</h1>
-            <Link to="/" className="continue-shopping">← Continue Shopping</Link>
+            <Link to="/" className="continue-shopping">
+              ← Continue Shopping
+            </Link>
           </div>
-          
+
           <div className="empty-cart">
             <div className="empty-cart-icon">🛒</div>
             <h2>Your cart is empty</h2>
             <p>Looks like you haven't added any items to your cart yet.</p>
-            <Link to="/" className="shop-now-btn">Start Shopping</Link>
+            <Link to="/" className="shop-now-btn">
+              Start Shopping
+            </Link>
           </div>
         </div>
 
-        <NotificationSystem 
-          notifications={notifications} 
-          onRemove={removeNotification} 
+        <NotificationSystem
+          notifications={notifications}
+          onRemove={removeNotification}
         />
       </div>
     );
@@ -169,7 +253,9 @@ const Cart = () => {
       <div className="container">
         <div className="cart-header">
           <h1>🛒 Your Shopping Cart ({getTotalItems()} items)</h1>
-          <Link to="/" className="continue-shopping">← Continue Shopping</Link>
+          <Link to="/" className="continue-shopping">
+            ← Continue Shopping
+          </Link>
         </div>
 
         <div className="cart-content">
@@ -181,39 +267,53 @@ const Cart = () => {
               </button>
             </div>
 
-            {cart.items.map(item => (
+            {cart.items.map((item) => (
               <div key={item.product._id} className="cart-item">
                 <div className="item-image">
-                  <img 
-                    src={item.product.image_url || 'https://via.placeholder.com/100x100?text=No+Image'} 
+                  <img
+                    src={
+                      item.product.image_url ||
+                      "https://via.placeholder.com/100x100?text=No+Image"
+                    }
                     alt={item.product.name}
                   />
                 </div>
-                
+
                 <div className="item-details">
                   <h3>{item.product.name}</h3>
                   <p className="item-category">{item.product.category}</p>
-                  <p className="item-price">₦{parseInt(item.product.price).toLocaleString()}</p>
+                  <p className="item-price">
+                    ₦{parseInt(item.product.price).toLocaleString()}
+                  </p>
                   <p className="item-stock">
-                    {item.product.stock < 5 
-                      ? `⚠️ Only ${item.product.stock} left` 
-                      : `✅ ${item.product.stock} in stock`
-                    }
+                    {item.product.stock < 5
+                      ? `⚠️ Only ${item.product.stock} left`
+                      : `✅ ${item.product.stock} in stock`}
                   </p>
                 </div>
 
                 <div className="item-quantity">
                   <label>Quantity:</label>
                   <div className="quantity-controls">
-                    <button 
-                      onClick={() => handleQuantityChange(item.product._id, item.quantity - 1)}
+                    <button
+                      onClick={() =>
+                        handleQuantityChange(
+                          item.product._id,
+                          item.quantity - 1
+                        )
+                      }
                       disabled={item.quantity <= 1}
                     >
                       -
                     </button>
                     <span className="quantity-display">{item.quantity}</span>
-                    <button 
-                      onClick={() => handleQuantityChange(item.product._id, item.quantity + 1)}
+                    <button
+                      onClick={() =>
+                        handleQuantityChange(
+                          item.product._id,
+                          item.quantity + 1
+                        )
+                      }
                       disabled={item.quantity >= item.product.stock}
                     >
                       +
@@ -223,11 +323,16 @@ const Cart = () => {
 
                 <div className="item-total">
                   <p className="item-subtotal">
-                    ₦{parseInt(item.product.price * item.quantity).toLocaleString()}
+                    ₦
+                    {parseInt(
+                      item.product.price * item.quantity
+                    ).toLocaleString()}
                   </p>
-                  <button 
+                  <button
                     className="remove-item-btn"
-                    onClick={() => handleRemoveItem(item.product._id, item.product.name)}
+                    onClick={() =>
+                      handleRemoveItem(item.product._id, item.product.name)
+                    }
                   >
                     🗑️ Remove
                   </button>
@@ -313,20 +418,45 @@ const Cart = () => {
               </div>
             </div>
 
-            <button 
+            <button
               className="place-order-btn"
               onClick={handlePlaceOrder}
               disabled={isProcessingOrder || cart.items.length === 0}
             >
-              {isProcessingOrder ? '🔄 Processing...' : '🚀 Place Order'}
+              {isProcessingOrder
+                ? "🔄 Processing..."
+                : "🚀 Place Order & Pay via WhatsApp"}
             </button>
+
+            <div
+              className="payment-info"
+              style={{
+                marginTop: "10px",
+                padding: "10px",
+                backgroundColor: "#f0f8ff",
+                borderRadius: "5px",
+                fontSize: "14px",
+                border: "1px solid #e0e0e0",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <span>📱</span>
+                <strong>Payment Process:</strong>
+              </div>
+              <p style={{ margin: "5px 0 0 0", color: "#666" }}>
+                After placing your order, you'll be redirected to WhatsApp to
+                complete payment with our team.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <NotificationSystem 
-        notifications={notifications} 
-        onRemove={removeNotification} 
+      <NotificationSystem
+        notifications={notifications}
+        onRemove={removeNotification}
       />
     </div>
   );
