@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
 import NotificationSystem from "./NotificationSystem";
-import { useCart } from "../context/CartContext";
+import OrderModal from "./OrderModal";
 
 const Home = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -11,7 +11,10 @@ const Home = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const { addToCart: addToCartContext, getTotalItems, getItemQuantity } = useCart();
+  const [orderModal, setOrderModal] = useState({
+    isOpen: false,
+    product: null,
+  });
 
   useEffect(() => {
     initAuth();
@@ -75,8 +78,22 @@ const Home = () => {
     );
   };
 
-  // Add to cart function
-  const addToCart = (productId) => {
+  // Order product function
+  const orderProduct = (productId) => {
+    if (!authToken || !currentUser) {
+      showNotification(
+        "Please login to place an order",
+        "info",
+        "🔐 Login Required"
+      );
+      setTimeout(() => {
+        window.location.href = `/auth?return=${encodeURIComponent(
+          window.location.href
+        )}`;
+      }, 1500);
+      return;
+    }
+
     const product = allProducts.find((p) => p._id === productId);
     if (!product) {
       showNotification("Product not found", "error", "❌ Product Error");
@@ -92,25 +109,7 @@ const Home = () => {
       return;
     }
 
-    // Check if adding one more would exceed stock
-    const currentQuantity = getItemQuantity(product._id);
-    
-    if (currentQuantity >= product.stock) {
-      showNotification(
-        `Cannot add more items. Only ${product.stock} available in stock`,
-        "warning",
-        "📦 Stock Limit"
-      );
-      return;
-    }
-
-    addToCartContext(product);
-
-    showNotification(
-      `${product.name} added to cart!`,
-      "success",
-      "🛒 Added to Cart"
-    );
+    showOrderConfirmation(product);
   };
 
   // Show notification
@@ -147,7 +146,64 @@ const Home = () => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
+  // Show order confirmation modal
+  const showOrderConfirmation = (product) => {
+    setOrderModal({ isOpen: true, product });
+  };
 
+  const handleOrderConfirm = (orderData) => {
+    submitOrder(orderData);
+  };
+
+  const closeOrderModal = () => {
+    setOrderModal({ isOpen: false, product: null });
+  };
+
+  const submitOrder = async (orderData) => {
+    try {
+      // Show loading notification
+      showNotification(
+        "Processing your order...",
+        "info",
+        "🚀 Order Processing"
+      );
+
+      const requestData = {
+        items: [
+          {
+            product: orderData.product._id,
+            quantity: orderData.quantity,
+          },
+        ],
+        shippingAddress: orderData.shippingAddress,
+        paymentMethod: "cash_on_delivery",
+      };
+
+      const response = await fetch("http://localhost:4000/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showNotification(
+          `Order placed successfully! Order #${result.order.orderNumber}`,
+          "order",
+          "🎉 Order Confirmed!"
+        );
+        loadProducts(); // Refresh products
+      } else {
+        showNotification(result.error || "Failed to place order", "error");
+      }
+    } catch (error) {
+      showNotification("Network error. Please try again.", "error");
+    }
+  };
 
   const filteredProducts = getFilteredProducts();
 
@@ -179,31 +235,6 @@ const Home = () => {
                   </Link>
                 </div>
               )}
-
-              {/* Cart Link */}
-              <Link to="/cart" className="nav-link" style={{ position: "relative" }}>
-                🛒 Cart
-                {getTotalItems() > 0 && (
-                  <span 
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-8px",
-                      backgroundColor: "#ff4757",
-                      color: "white",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      minWidth: "18px",
-                      textAlign: "center",
-                      lineHeight: "14px"
-                    }}
-                  >
-                    {getTotalItems()}
-                  </span>
-                )}
-              </Link>
 
               {/* User Links */}
               {currentUser && (
@@ -372,9 +403,9 @@ const Home = () => {
                     <button
                       className="add-to-cart"
                       disabled={product.stock < 1}
-                      onClick={() => addToCart(product._id)}
+                      onClick={() => orderProduct(product._id)}
                     >
-                      {product.stock < 1 ? "❌ Out of Stock" : "🛒 Add to Cart"}
+                      {product.stock < 1 ? "❌ Out of Stock" : "🛒 Order Now"}
                     </button>
                   </div>
                 </div>
@@ -395,6 +426,15 @@ const Home = () => {
       <NotificationSystem
         notifications={notifications}
         onRemove={removeNotification}
+      />
+
+      {/* Order Modal */}
+      <OrderModal
+        isOpen={orderModal.isOpen}
+        product={orderModal.product}
+        currentUser={currentUser}
+        onClose={closeOrderModal}
+        onConfirm={handleOrderConfirm}
       />
     </div>
   );
