@@ -76,6 +76,21 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .form-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.25rem;
+            line-height: 1.4;
+        }
+
+        .form-text code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            color: #e83e8c;
+            font-size: 0.8rem;
+        }
+
         .login-btn {
             width: 100%;
             background: linear-gradient(45deg, #667eea, #764ba2);
@@ -411,9 +426,15 @@
                                 placeholder="Product description..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="image_url">Image URL</label>
-                            <input type="url" id="image_url" name="image_url"
-                                placeholder="https://example.com/image.jpg">
+                            <label for="image_url">Image URL or Filename</label>
+                            <input type="text" id="image_url" name="image_url"
+                                placeholder="lasse.jpg or https://example.com/image.jpg">
+                            <small class="form-text">
+                                📸 Use either:<br>
+                                • Local filename: <code>lasse.jpg</code><br>
+                                • Full URL: <code>https://example.com/image.jpg</code><br>
+                                • Base64 data: <code>data:image/jpeg;base64,...</code>
+                            </small>
                         </div>
                         <button type="submit" class="btn btn-success">Add Product</button>
                         <button type="reset" class="btn">Clear Form</button>
@@ -477,8 +498,11 @@
                                 <textarea id="editDescription" name="description"></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="editImageUrl">Image URL</label>
-                                <input type="url" id="editImageUrl" name="image_url">
+                                <label for="editImageUrl">Image URL or Filename</label>
+                                <input type="text" id="editImageUrl" name="image_url">
+                                <small class="form-text">
+                                    📸 Use filename (lasse.jpg) or full URL
+                                </small>
                             </div>
                             <button type="submit" class="btn btn-warning">Update Product</button>
                             <button type="button" class="btn" onclick="cancelEdit()">Cancel</button>

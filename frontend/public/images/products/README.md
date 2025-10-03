@@ -3,6 +3,7 @@
 This directory contains product images for the e-commerce store.
 
 ## File Structure
+
 ```
 /frontend/public/images/products/
 ├── t-shirt-red.jpg
@@ -19,14 +20,17 @@ This directory contains product images for the e-commerce store.
 ## Adding Your Own Images
 
 1. **Copy your images to this folder:**
+
    - Navigate to: `/frontend/public/images/products/`
    - Copy your product images here
 
 2. **Rename your images using this format:**
+
    - `product-type-color.jpg`
    - Examples: `t-shirt-red.jpg`, `hoodie-black.jpg`
 
 3. **Recommended image specifications:**
+
    - **Size**: 400x300 pixels (4:3 aspect ratio)
    - **Format**: JPG, PNG, or WebP
    - **File size**: Under 500KB for best performance
@@ -46,6 +50,7 @@ This directory contains product images for the e-commerce store.
 ## Image Optimization Tips
 
 1. **Resize before uploading**: Use tools like:
+
    - GIMP (free)
    - Photoshop
    - Online tools like TinyPNG

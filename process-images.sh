@@ -39,7 +39,7 @@ process_images() {
     echo ""
     
     # Process each image file
-    for img in "$input_dir"/*.{jpg,jpeg,png,JPG,JPEG,PNG} 2>/dev/null; do
+    for img in "$input_dir"/*.jpg "$input_dir"/*.jpeg "$input_dir"/*.png "$input_dir"/*.JPG "$input_dir"/*.JPEG "$input_dir"/*.PNG; do
         if [ -f "$img" ]; then
             filename=$(basename "$img")
             name="${filename%.*}"
