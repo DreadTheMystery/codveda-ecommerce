@@ -4,6 +4,7 @@ import "./Home.css";
 import NotificationSystem from "./NotificationSystem";
 import { useCart } from "../context/CartContext";
 import { getProductImageUrl, handleImageError } from "../config/images";
+import { API_URLS } from "../config/api";
 
 const Home = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -51,7 +52,7 @@ const Home = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/api/products");
+      const res = await fetch(API_URLS.PRODUCTS);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
 

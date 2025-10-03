@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import NotificationSystem from "./NotificationSystem";
 import { formatOrderMessage, createWhatsAppUrl } from "../config/whatsapp";
+import { API_URLS } from "../config/api";
 import "./Cart.css";
 
 const Cart = () => {
@@ -178,7 +179,7 @@ const Cart = () => {
         paymentMethod: "cash_on_delivery",
       };
 
-      const response = await fetch("http://localhost:4000/api/orders", {
+      const response = await fetch(API_URLS.ORDERS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
