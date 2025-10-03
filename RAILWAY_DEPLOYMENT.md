@@ -5,6 +5,7 @@
 Create these environment variables in your Railway dashboard:
 
 ### Backend Environment Variables:
+
 ```
 NODE_ENV=production
 PORT=4000
@@ -13,6 +14,7 @@ JWT_SECRET=your-super-secret-jwt-key-min-32-characters
 ```
 
 ### Frontend Environment Variables:
+
 ```
 VITE_API_URL=https://your-backend-url.railway.app
 ```
@@ -28,6 +30,7 @@ VITE_API_URL=https://your-backend-url.railway.app
 ## MongoDB Setup:
 
 You'll need a MongoDB database. Options:
+
 - **MongoDB Atlas** (recommended): Free tier available
 - **Railway MongoDB**: Add from Railway services
 
@@ -39,6 +42,7 @@ This will work automatically once deployed.
 ## Domain:
 
 Railway provides:
+
 - Free subdomain: `your-app-name.railway.app`
 - Custom domain support (paid plans)
 

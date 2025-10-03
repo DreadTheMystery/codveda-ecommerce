@@ -1,14 +1,14 @@
 // API Configuration for Production and Development
 export const API_CONFIG = {
   // Use environment variable or fallback to localhost for development
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:4000',
-  
+  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:4000",
+
   // API endpoints
   ENDPOINTS: {
-    PRODUCTS: '/api/products',
-    ORDERS: '/api/orders', 
-    AUTH: '/api/auth'
-  }
+    PRODUCTS: "/api/products",
+    ORDERS: "/api/orders",
+    AUTH: "/api/auth",
+  },
 };
 
 // Helper function to build API URLs

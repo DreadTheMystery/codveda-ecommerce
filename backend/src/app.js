@@ -13,16 +13,17 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // CORS configuration for production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, /\.railway\.app$/] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  origin:
+    process.env.NODE_ENV === "production"
+      ? [process.env.FRONTEND_URL, /\.railway\.app$/]
+      : ["http://localhost:3000", "http://localhost:3001"],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.get("/", (req, res) =>
   res.json({
