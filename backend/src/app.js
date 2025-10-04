@@ -16,23 +16,24 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
       "http://localhost:3000",
-      "http://localhost:3001", 
+      "http://localhost:3001",
       "https://nafsykay.netlify.app",
+      "https://codveda-ecommerce-frontend.onrender.com",
       process.env.FRONTEND_URL,
     ];
-    
+
     // Allow all netlify.app subdomains (including deploy previews)
-    const isNetlifyDomain = origin.includes('.netlify.app');
-    const isOnRenderDomain = origin.includes('.onrender.com'); 
+    const isNetlifyDomain = origin.includes(".netlify.app");
+    const isOnRenderDomain = origin.includes(".onrender.com");
     const isAllowedOrigin = allowedOrigins.includes(origin);
-    
+
     if (isAllowedOrigin || isNetlifyDomain || isOnRenderDomain) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
