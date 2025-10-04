@@ -13,10 +13,28 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // CORS configuration for production
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === "production"
-      ? [process.env.FRONTEND_URL, /\.railway\.app$/]
-      : ["http://localhost:3000", "http://localhost:3001"],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "http://localhost:3001", 
+      "https://nafsykay.netlify.app",
+      process.env.FRONTEND_URL,
+    ];
+    
+    // Allow all netlify.app subdomains (including deploy previews)
+    const isNetlifyDomain = origin.includes('.netlify.app');
+    const isOnRenderDomain = origin.includes('.onrender.com'); 
+    const isAllowedOrigin = allowedOrigins.includes(origin);
+    
+    if (isAllowedOrigin || isNetlifyDomain || isOnRenderDomain) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
 };
