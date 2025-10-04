@@ -1,7 +1,7 @@
 // API Configuration for Production and Development
 export const API_CONFIG = {
-  // Use environment variable or fallback to localhost for development
-  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:4000",
+  // Use environment variable or fallback to production backend
+  BASE_URL: import.meta.env.VITE_API_URL || "https://codveda-ecommerce.onrender.com",
 
   // API endpoints
   ENDPOINTS: {
