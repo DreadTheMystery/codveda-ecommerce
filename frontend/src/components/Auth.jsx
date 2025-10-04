@@ -44,7 +44,7 @@ const Auth = () => {
         // Store token and redirect
         localStorage.setItem("token", data.token);
         localStorage.setItem("userData", JSON.stringify(data.user));
-        alert("Login successful!");
+        alert("Login successful! Welcome back!");
         window.location.href = "/";
       } else {
         alert(data.message || "Login failed");
@@ -79,7 +79,7 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Registration successful! Please login.");
+        alert("Registration successful! You can now login.");
         setActiveTab("login");
         setRegisterData({
           name: "",
