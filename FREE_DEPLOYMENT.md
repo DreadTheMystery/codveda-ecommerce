@@ -2,21 +2,22 @@
 
 ## 🆓 **Why This is Better Than Railway:**
 
-| Platform | Railway | Vercel + Render |
-|----------|---------|-----------------|
-| **Cost** | 30 days free | Forever free* |
-| **Frontend** | Limited | Unlimited |
-| **Backend** | Limited | 750 hours/month |
-| **Database** | Extra cost | Free MongoDB Atlas |
-| **Domains** | Limited | Custom domains |
+| Platform     | Railway      | Vercel + Render    |
+| ------------ | ------------ | ------------------ |
+| **Cost**     | 30 days free | Forever free\*     |
+| **Frontend** | Limited      | Unlimited          |
+| **Backend**  | Limited      | 750 hours/month    |
+| **Database** | Extra cost   | Free MongoDB Atlas |
+| **Domains**  | Limited      | Custom domains     |
 
-*Free tiers are generous for small-medium projects*
+_Free tiers are generous for small-medium projects_
 
 ---
 
 ## ⚡ **Quick Deploy (5 Minutes)**
 
 ### **1. Frontend → Vercel**
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -27,6 +28,7 @@ vercel --prod
 ```
 
 ### **2. Backend → Render**
+
 1. Go to https://render.com
 2. "New Web Service" → Connect GitHub
 3. Select `codveda-ecommerce` repo
@@ -35,6 +37,7 @@ vercel --prod
 6. Start: `npm start`
 
 ### **3. Database → MongoDB Atlas**
+
 1. Go to https://cloud.mongodb.com
 2. Create free cluster (512MB forever)
 3. Get connection string
@@ -45,11 +48,13 @@ vercel --prod
 ## 🔧 **Environment Variables**
 
 ### **Vercel (Frontend)**
+
 ```
 VITE_API_URL=https://your-backend.onrender.com
 ```
 
 ### **Render (Backend)**
+
 ```
 NODE_ENV=production
 MONGODB_URI=mongodb+srv://your-connection...
