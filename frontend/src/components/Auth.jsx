@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Auth.css";
+import { getApiUrl } from "../config/api";
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState("login");
@@ -27,12 +28,12 @@ const Auth = () => {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://codveda-ecommerce.onrender.com'}/api/auth/login`, {
-        method: 'POST',
+      const response = await fetch(getApiUrl("/api/auth/login"), {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(loginData),
       });
@@ -41,32 +42,32 @@ const Auth = () => {
 
       if (response.ok) {
         // Store token and redirect
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('userData', JSON.stringify(data.user));
-        alert('Login successful!');
-        window.location.href = '/';
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userData", JSON.stringify(data.user));
+        alert("Login successful!");
+        window.location.href = "/";
       } else {
-        alert(data.message || 'Login failed');
+        alert(data.message || "Login failed");
       }
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Network error. Please try again.');
+      console.error("Login error:", error);
+      alert("Network error. Please try again.");
     }
   };
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (registerData.password !== registerData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://codveda-ecommerce.onrender.com'}/api/auth/register`, {
-        method: 'POST',
+      const response = await fetch(getApiUrl("/api/auth/register"), {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: registerData.name,
@@ -78,15 +79,20 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert('Registration successful! Please login.');
-        setActiveTab('login');
-        setRegisterData({ name: '', email: '', password: '', confirmPassword: '' });
+        alert("Registration successful! Please login.");
+        setActiveTab("login");
+        setRegisterData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
       } else {
-        alert(data.message || 'Registration failed');
+        alert(data.message || "Registration failed");
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      alert('Network error. Please try again.');
+      console.error("Registration error:", error);
+      alert("Network error. Please try again.");
     }
   };
 
