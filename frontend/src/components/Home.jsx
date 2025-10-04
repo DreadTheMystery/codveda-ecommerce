@@ -26,7 +26,7 @@ const Home = () => {
 
   // Authentication functions
   const initAuth = () => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
     const userData = localStorage.getItem("userData");
 
     if (token && userData) {
@@ -36,7 +36,7 @@ const Home = () => {
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("token");
     localStorage.removeItem("userData");
     setCurrentUser(null);
     setAuthToken(null);

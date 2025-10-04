@@ -140,10 +140,11 @@ const Cart = () => {
       !shippingAddress.name ||
       !shippingAddress.phone ||
       !shippingAddress.street ||
-      !shippingAddress.city
+      !shippingAddress.city ||
+      !shippingAddress.state
     ) {
       showNotification(
-        "Please fill in all required shipping details",
+        "Please fill in all required shipping details (including state)",
         "warning",
         "📋 Missing Information"
       );
@@ -151,7 +152,7 @@ const Cart = () => {
     }
 
     // Check authentication
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("token");
     if (!authToken) {
       showNotification(
         "Please login to place your order",
@@ -192,7 +193,7 @@ const Cart = () => {
 
       if (response.ok) {
         showNotification(
-          `Order placed successfully! Order #${result.order.orderNumber}`,
+          `Order placed successfully! Order #${result.order._id.slice(-8)}`,
           "order",
           "🎉 Order Confirmed!"
         );
