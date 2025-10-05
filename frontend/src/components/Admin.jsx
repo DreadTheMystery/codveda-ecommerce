@@ -3,18 +3,46 @@ import "./Admin.css";
 
 const Admin = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [credentials, setCredentials] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simple demo login - in real app, this would connect to your backend
-    if (credentials.username === "admin" && credentials.password === "admin") {
-      setIsLoggedIn(true);
-    } else {
-      alert("Invalid credentials. Try username: admin, password: admin");
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.user.role === "admin") {
+        localStorage.setItem("adminToken", data.token);
+        localStorage.setItem("adminUser", JSON.stringify(data.user));
+        setIsLoggedIn(true);
+      } else if (data.user && data.user.role !== "admin") {
+        setError("Access denied. Admin privileges required.");
+      } else {
+        setError(data.message || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("Network error. Please check your connection.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,16 +58,29 @@ const Admin = () => {
       <div className="admin-page">
         <div className="login-container">
           <div className="login-form">
-            <h2>Admin Login</h2>
+            <h2>🔐 Admin Login</h2>
+            {error && (
+              <div className="error-message" style={{
+                backgroundColor: '#fee',
+                color: '#c33',
+                padding: '10px',
+                borderRadius: '5px',
+                marginBottom: '15px',
+                border: '1px solid #fcc'
+              }}>
+                {error}
+              </div>
+            )}
             <form onSubmit={handleLogin}>
               <div className="form-group">
-                <label>Username</label>
+                <label>Email</label>
                 <input
-                  type="text"
-                  name="username"
-                  value={credentials.username}
+                  type="email"
+                  name="email"
+                  value={credentials.email}
                   onChange={handleInputChange}
                   required
+                  disabled={loading}
                 />
               </div>
               <div className="form-group">
@@ -50,10 +91,11 @@ const Admin = () => {
                   value={credentials.password}
                   onChange={handleInputChange}
                   required
+                  disabled={loading}
                 />
               </div>
-              <button type="submit" className="login-btn">
-                Login to Admin Panel
+              <button type="submit" className="login-btn" disabled={loading}>
+                {loading ? "Logging in..." : "Login to Admin Panel"}
               </button>
             </form>
             <p className="demo-info">Demo: username: admin, password: admin</p>
