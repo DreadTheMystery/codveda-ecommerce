@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Home.css";
 import NotificationSystem from "./NotificationSystem";
+import OrderModal from "./OrderModal";
 import { useCart } from "../context/CartContext";
 import { getProductImageUrl, handleImageError } from "../config/images";
 import { API_URLS } from "../config/api";
+import { formatOrderMessage, createWhatsAppUrl } from "../config/whatsapp";
 
 const Home = () => {
   const [allProducts, setAllProducts] = useState([]);
@@ -13,6 +15,10 @@ const Home = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [orderModal, setOrderModal] = useState({
+    isOpen: false,
+    product: null,
+  });
   const {
     addToCart: addToCartContext,
     getTotalItems,
@@ -151,6 +157,110 @@ const Home = () => {
 
   const removeNotification = (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  // Order Modal Functions
+  const showOrderConfirmation = (product) => {
+    if (!currentUser) {
+      showNotification(
+        "Please login to place an order",
+        "warning",
+        "🔐 Login Required"
+      );
+      return;
+    }
+    setOrderModal({ isOpen: true, product });
+  };
+
+  const handleOrderConfirm = (orderData) => {
+    submitOrder(orderData);
+  };
+
+  const closeOrderModal = () => {
+    setOrderModal({ isOpen: false, product: null });
+  };
+
+  // WhatsApp redirect function
+  const redirectToWhatsApp = (order, orderData) => {
+    try {
+      const orderItems = `${orderData.product.name} x ${orderData.quantity}`;
+      const message = formatOrderMessage(
+        order,
+        orderData.shippingAddress,
+        orderItems,
+        orderData.totalAmount
+      );
+
+      const whatsappUrl = createWhatsAppUrl(message);
+
+      showNotification(
+        "Redirecting to WhatsApp for payment confirmation...",
+        "info",
+        "📱 WhatsApp Payment"
+      );
+
+      // Open WhatsApp in a new tab
+      setTimeout(() => {
+        window.open(whatsappUrl, "_blank");
+      }, 1000);
+    } catch (error) {
+      console.error("WhatsApp redirect error:", error);
+      showNotification(
+        "Error redirecting to WhatsApp. Please contact support.",
+        "error"
+      );
+    }
+  };
+
+  const submitOrder = async (orderData) => {
+    try {
+      // Show loading notification
+      showNotification(
+        "Processing your order...",
+        "info",
+        "🚀 Order Processing"
+      );
+
+      const requestData = {
+        items: [
+          {
+            product: orderData.product._id,
+            quantity: orderData.quantity,
+          },
+        ],
+        shippingAddress: orderData.shippingAddress,
+        paymentMethod: "cash_on_delivery",
+      };
+
+      const response = await fetch(API_URLS.ORDERS, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showNotification(
+          `Order placed successfully! Order #${result.order.orderNumber}`,
+          "order",
+          "🎉 Order Confirmed!"
+        );
+
+        // Redirect to WhatsApp for payment
+        redirectToWhatsApp(result.order, orderData);
+
+        loadProducts(); // Refresh products
+      } else {
+        showNotification(result.error || "Failed to place order", "error");
+      }
+    } catch (error) {
+      console.error("Order submission error:", error);
+      showNotification("Network error. Please try again.", "error");
+    }
   };
 
   const filteredProducts = getFilteredProducts();
@@ -365,13 +475,24 @@ const Home = () => {
                           : `✅ ${product.stock} in stock`}
                       </div>
                     </div>
-                    <button
-                      className="add-to-cart"
-                      disabled={product.stock < 1}
-                      onClick={() => addToCart(product._id)}
-                    >
-                      {product.stock < 1 ? "❌ Out of Stock" : "🛒 Add to Cart"}
-                    </button>
+                    <div className="card-actions">
+                      <button
+                        className="add-to-cart"
+                        disabled={product.stock < 1}
+                        onClick={() => addToCart(product._id)}
+                      >
+                        {product.stock < 1
+                          ? "❌ Out of Stock"
+                          : "🛒 Add to Cart"}
+                      </button>
+                      <button
+                        className="buy-now"
+                        disabled={product.stock < 1}
+                        onClick={() => showOrderConfirmation(product)}
+                      >
+                        {product.stock < 1 ? "❌ Out of Stock" : "🚀 Buy Now"}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -386,6 +507,15 @@ const Home = () => {
           </p>
         </div>
       </footer>
+
+      {/* Order Modal */}
+      <OrderModal
+        isOpen={orderModal.isOpen}
+        product={orderModal.product}
+        currentUser={currentUser}
+        onClose={closeOrderModal}
+        onConfirm={handleOrderConfirm}
+      />
 
       {/* Notification System */}
       <NotificationSystem

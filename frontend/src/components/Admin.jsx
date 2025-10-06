@@ -16,16 +16,19 @@ const Admin = () => {
     setError("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -60,14 +63,17 @@ const Admin = () => {
           <div className="login-form">
             <h2>🔐 Admin Login</h2>
             {error && (
-              <div className="error-message" style={{
-                backgroundColor: '#fee',
-                color: '#c33',
-                padding: '10px',
-                borderRadius: '5px',
-                marginBottom: '15px',
-                border: '1px solid #fcc'
-              }}>
+              <div
+                className="error-message"
+                style={{
+                  backgroundColor: "#fee",
+                  color: "#c33",
+                  padding: "10px",
+                  borderRadius: "5px",
+                  marginBottom: "15px",
+                  border: "1px solid #fcc",
+                }}
+              >
                 {error}
               </div>
             )}

@@ -20,6 +20,7 @@ const corsOptions = {
     const allowedOrigins = [
       "http://localhost:3000",
       "http://localhost:3001",
+      "http://localhost:3002",
       "https://nafsykay.netlify.app",
       "https://codveda-ecommerce-frontend.onrender.com",
       process.env.FRONTEND_URL,
@@ -41,11 +42,22 @@ const corsOptions = {
 };
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://nafsykay.onrender.com"); // or '*' for testing
+  // Allow localhost for development
+  const origin = req.headers.origin;
+  if (
+    origin &&
+    (origin.includes("localhost") || origin.includes("127.0.0.1"))
+  ) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      "https://nafsykay.onrender.com"
+    );
+  }
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  // If you need cookies/auth:
-  // res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader("Access-Control-Allow-Credentials", "true");
 
   // respond to OPTIONS preflight
   if (req.method === "OPTIONS") {
