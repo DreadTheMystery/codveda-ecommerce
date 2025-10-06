@@ -336,45 +336,19 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .order-modal-backdrop {
-        padding: 10px;
+        padding: 1rem;
+        align-items: flex-start;
+        padding-top: 2rem;
     }
 
     .order-modal {
-        max-height: 95vh;
-    }
-
-    .modal-header,
-    .modal-content,
-    .modal-footer {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
-    .product-preview {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .product-image {
-        align-self: center;
-    }
-
-    .form-row {
-        flex-direction: column;
-    }
-
-    .modal-footer {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 480px) {
-    .order-modal {
-        margin: 0;
+        max-height: 90vh;
+        max-width: 95%;
         border-radius: 16px;
     }
 
     .modal-header {
+        padding: 1.2rem 1.5rem 1rem;
         border-radius: 16px 16px 0 0;
     }
 
@@ -382,12 +356,315 @@
         font-size: 1.3rem;
     }
 
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .modal-content {
+        padding: 1.5rem;
+    }
+
     .product-preview {
-        padding: 16px;
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .product-image {
+        align-self: center;
+    }
+
+    .product-image img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .product-details h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .product-price {
+        font-size: 1.2rem;
+    }
+
+    .quantity-section {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .quantity-section label {
+        font-size: 0.9rem;
+    }
+
+    .quantity-controls button {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .quantity-display {
+        min-width: 40px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .shipping-section h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .address-form input {
+        padding: 0.7rem;
+        font-size: 0.9rem;
+    }
+
+    .order-summary {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .order-summary h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .summary-row {
+        font-size: 0.9rem;
+    }
+
+    .summary-row.total {
+        font-size: 1.1rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        flex-direction: column-reverse;
+        gap: 0.8rem;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-modal-backdrop {
+        padding: 0.5rem;
+        padding-top: 1rem;
+    }
+
+    .order-modal {
+        max-height: 95vh;
+        max-width: 98%;
+        border-radius: 12px;
+    }
+
+    .modal-header {
+        padding: 1rem 1.2rem 0.8rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .modal-close {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+
+    .modal-content {
+        padding: 1.2rem;
+    }
+
+    .product-preview {
+        padding: 0.8rem;
+        margin-bottom: 1.2rem;
+        border-radius: 12px;
+    }
+
+    .product-image img {
+        width: 60px;
+        height: 60px;
+    }
+
+    .product-details h3 {
+        font-size: 1rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .product-category {
+        font-size: 0.8rem;
+    }
+
+    .product-price {
+        font-size: 1.1rem;
+    }
+
+    .stock-info {
+        font-size: 0.75rem;
+    }
+
+    .quantity-section {
+        padding: 0.8rem;
+        margin-bottom: 1.2rem;
+        border-radius: 12px;
+    }
+
+    .quantity-section label {
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .quantity-controls {
+        gap: 0.5rem;
+    }
+
+    .quantity-controls button {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .quantity-display {
+        min-width: 35px;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .shipping-section h4 {
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .address-form input {
+        padding: 0.6rem;
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+
+    .order-summary {
+        padding: 0.8rem;
+        margin-bottom: 1.2rem;
+        border-radius: 12px;
+    }
+
+    .order-summary h4 {
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .summary-row {
+        font-size: 0.85rem;
+        padding: 0.3rem 0;
+    }
+
+    .summary-row.total {
+        font-size: 1rem;
+        padding: 0.5rem 0;
+    }
+
+    .free-shipping {
+        font-size: 0.8rem;
+    }
+
+    .modal-footer {
+        padding: 0.8rem 1.2rem 1.2rem;
+        gap: 0.6rem;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+        padding: 0.7rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 360px) {
+    .order-modal-backdrop {
+        padding: 0.25rem;
+        padding-top: 0.5rem;
+    }
+
+    .order-modal {
+        max-width: 100%;
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        padding: 0.8rem 1rem 0.6rem;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal-close {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .product-preview {
+        padding: 0.6rem;
+        gap: 0.8rem;
+    }
+
+    .product-image img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .product-details h3 {
+        font-size: 0.9rem;
     }
 
     .quantity-section,
     .order-summary {
-        padding: 16px;
+        padding: 0.6rem;
+        margin-bottom: 1rem;
+    }
+
+    .quantity-controls button {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .quantity-display {
+        min-width: 30px;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+
+    .address-form input {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-cancel,
+    .btn-confirm {
+        padding: 0.6rem;
+        font-size: 0.8rem;
     }
 }

@@ -19,6 +19,7 @@ const Home = () => {
     isOpen: false,
     product: null,
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const {
     addToCart: addToCartContext,
     getTotalItems,
@@ -28,6 +29,13 @@ const Home = () => {
   useEffect(() => {
     initAuth();
     loadProducts();
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "unset";
+    };
   }, []);
 
   // Authentication functions
@@ -159,6 +167,17 @@ const Home = () => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
+  // Mobile menu toggle
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    // Prevent body scroll when menu is open
+    if (!isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+  };
+
   // Order Modal Functions
   const showOrderConfirmation = (product) => {
     if (!currentUser) {
@@ -267,75 +286,110 @@ const Home = () => {
 
   return (
     <div>
-      <header className="header">
+      <header>
         <div className="container">
-          <nav className="nav">
-            <div className="logo">🛍️ CodVeda</div>
-            <div className="nav-links">
-              <a href="#" className="nav-link">
-                Home
-              </a>
-              <a href="#products" className="nav-link">
+          <nav className="navbar">
+            <div className="nav-brand">
+              <Link to="/">CODVEDA</Link>
+            </div>
+
+            {/* Mobile cart icon - always visible */}
+            <div className="mobile-nav-right">
+              <Link
+                to="/cart"
+                className="mobile-cart-icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                🛒
+                {getTotalItems() > 0 && (
+                  <span className="cart-badge">{getTotalItems()}</span>
+                )}
+              </Link>
+
+              {/* Mobile menu button */}
+              <button
+                className="mobile-menu-btn"
+                onClick={toggleMobileMenu}
+                aria-label="Toggle menu"
+              >
+                <div
+                  className={`hamburger ${isMobileMenuOpen ? "active" : ""}`}
+                >
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </button>
+            </div>
+
+            <div className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
+              <a
+                href="#products"
+                className="nav-link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 Products
               </a>
-              <a href="#" className="nav-link">
+              <a
+                href="#"
+                className="nav-link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 About
               </a>
-              <a href="#" className="nav-link">
+              <a
+                href="#"
+                className="nav-link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
                 Contact
               </a>
 
               {/* Guest Links */}
               {!currentUser && (
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <Link to="/auth" className="nav-link">
+                <div className="auth-links">
+                  <Link
+                    to="/auth"
+                    className="nav-link"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     Login
                   </Link>
                 </div>
               )}
 
-              {/* Cart Link */}
+              {/* Desktop Cart Link - hidden on mobile */}
               <Link
                 to="/cart"
-                className="nav-link"
-                style={{ position: "relative" }}
+                className="nav-link cart-link desktop-cart"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 🛒 Cart
                 {getTotalItems() > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-8px",
-                      right: "-8px",
-                      backgroundColor: "#ff4757",
-                      color: "white",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      minWidth: "18px",
-                      textAlign: "center",
-                      lineHeight: "14px",
-                    }}
-                  >
-                    {getTotalItems()}
-                  </span>
+                  <span className="cart-badge">{getTotalItems()}</span>
                 )}
               </Link>
 
               {/* User Links */}
               {currentUser && (
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <span className="nav-link">Hi, {currentUser.name}!</span>
-                  <a href="#" className="nav-link">
+                <div className="user-links">
+                  <span className="nav-link user-greeting">
+                    Hi, {currentUser.name}!
+                  </span>
+                  <a
+                    href="#"
+                    className="nav-link"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     My Orders
                   </a>
                   <a
                     href="#"
-                    className="nav-link"
+                    className="nav-link logout-link"
                     onClick={(e) => {
                       e.preventDefault();
                       logout();
+                      setIsMobileMenuOpen(false);
                     }}
                   >
                     Logout
@@ -345,8 +399,7 @@ const Home = () => {
             </div>
           </nav>
         </div>
-      </header>
-
+      </header>{" "}
       <section className="hero">
         <div className="container">
           <h1>Premium Fashion Collection</h1>
@@ -359,7 +412,6 @@ const Home = () => {
           </a>
         </div>
       </section>
-
       <section id="products" className="products-section">
         <div className="container">
           <div className="section-title">
@@ -499,7 +551,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       <footer className="footer">
         <div className="container">
           <p>
@@ -507,7 +558,6 @@ const Home = () => {
           </p>
         </div>
       </footer>
-
       {/* Order Modal */}
       <OrderModal
         isOpen={orderModal.isOpen}
@@ -516,7 +566,6 @@ const Home = () => {
         onClose={closeOrderModal}
         onConfirm={handleOrderConfirm}
       />
-
       {/* Notification System */}
       <NotificationSystem
         notifications={notifications}
