@@ -20,6 +20,15 @@ const Home = () => {
     product: null,
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [contactSubmitting, setContactSubmitting] = useState(false);
+  const [contactStatus, setContactStatus] = useState(null);
+  const [activeSection, setActiveSection] = useState("hero");
   const {
     addToCart: addToCartContext,
     getTotalItems,
@@ -29,6 +38,35 @@ const Home = () => {
   useEffect(() => {
     initAuth();
     loadProducts();
+  }, []);
+
+  // Scroll listener for active section detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["hero", "products", "about", "contact"];
+      const scrollPosition = window.scrollY + 100; // Offset for header
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial position
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   // Cleanup on unmount
@@ -199,6 +237,80 @@ const Home = () => {
     setOrderModal({ isOpen: false, product: null });
   };
 
+  // Navigation functions
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  // Contact form functions
+  const handleContactChange = (e) => {
+    setContactForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactSubmitting(true);
+    setContactStatus(null);
+
+    // Basic client validation
+    if (!contactForm.name || !contactForm.email || !contactForm.message) {
+      setContactStatus({
+        type: "error",
+        message: "Please fill name, email and message.",
+      });
+      setContactSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URLS.BASE_URL}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(contactForm),
+      });
+
+      if (response.ok) {
+        setContactStatus({
+          type: "success",
+          message: "Message sent — thank you!",
+        });
+        setContactForm({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+        showNotification("Message sent successfully!", "success");
+      } else {
+        const data = await response.json();
+        setContactStatus({
+          type: "error",
+          message: data?.error || "Failed to send message.",
+        });
+      }
+    } catch (err) {
+      console.error("Contact form error:", err);
+      setContactStatus({
+        type: "error",
+        message: "Network error. Try again later.",
+      });
+    } finally {
+      setContactSubmitting(false);
+    }
+  };
+
   // WhatsApp redirect function
   const redirectToWhatsApp = (order, orderData) => {
     try {
@@ -325,22 +437,37 @@ const Home = () => {
             <div className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
               <a
                 href="#products"
-                className="nav-link"
-                onClick={() => setIsMobileMenuOpen(false)}
+                className={`nav-link ${
+                  activeSection === "products" ? "active-section" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("products");
+                }}
               >
                 Products
               </a>
               <a
-                href="#"
-                className="nav-link"
-                onClick={() => setIsMobileMenuOpen(false)}
+                href="#about"
+                className={`nav-link ${
+                  activeSection === "about" ? "active-section" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("about");
+                }}
               >
                 About
               </a>
               <a
-                href="#"
-                className="nav-link"
-                onClick={() => setIsMobileMenuOpen(false)}
+                href="#contact"
+                className={`nav-link ${
+                  activeSection === "contact" ? "active-section" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection("contact");
+                }}
               >
                 Contact
               </a>
@@ -400,7 +527,7 @@ const Home = () => {
           </nav>
         </div>
       </header>{" "}
-      <section className="hero">
+      <section id="hero" className="hero">
         <div className="container">
           <h1>Premium Fashion Collection</h1>
           <p>
@@ -549,6 +676,132 @@ const Home = () => {
                 </div>
               ))}
           </div>
+        </div>
+      </section>
+      {/* About Section */}
+      <section id="about" className="section about-section">
+        <div className="container">
+          <div className="section-title">
+            <h2>About CodVeda</h2>
+          </div>
+          <div className="about-grid">
+            <div className="about-text">
+              <p>
+                <strong>CodVeda</strong> is a modern, lightweight e-commerce
+                storefront and admin demo built with Node.js, Express and
+                MongoDB. We focus on simple, usable shopping experiences and a
+                clear admin panel to manage products and inventory.
+              </p>
+
+              <p>What makes CodVeda different:</p>
+              <ul>
+                <li>Clean, responsive UI for customers</li>
+                <li>Simple admin CRUD for product management</li>
+                <li>
+                  Designed as a learning / portfolio project — easy to extend
+                </li>
+              </ul>
+              <p className="muted">
+                Built by <em>DreadTheMystery</em>. Check source code or
+                contribute on GitHub.
+              </p>
+            </div>
+
+            <div className="about-stats">
+              <div className="stat">
+                <div className="stat-number">3+</div>
+                <div className="stat-label">Categories</div>
+              </div>
+              <div className="stat">
+                <div className="stat-number">30+</div>
+                <div className="stat-label">Sample products</div>
+              </div>
+              <div className="stat">
+                <div className="stat-number">Admin</div>
+                <div className="stat-label">CRUD ready</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* Contact Section */}
+      <section id="contact" className="section contact-section">
+        <div className="container">
+          <div className="section-title">
+            <h2>Contact Us</h2>
+            <p>
+              If you have questions or want to collaborate — drop a message
+              below.
+            </p>
+          </div>
+
+          <form
+            id="contactForm"
+            className="contact-form"
+            onSubmit={handleContactSubmit}
+          >
+            <div className="form-row">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Your name"
+                value={contactForm.name}
+                onChange={handleContactChange}
+                required
+              />
+            </div>
+            <div className="form-row">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Your email"
+                value={contactForm.email}
+                onChange={handleContactChange}
+                required
+              />
+            </div>
+            <div className="form-row">
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                placeholder="Subject"
+                value={contactForm.subject}
+                onChange={handleContactChange}
+              />
+            </div>
+            <div className="form-row">
+              <textarea
+                id="message"
+                name="message"
+                placeholder="Your message"
+                rows="6"
+                value={contactForm.message}
+                onChange={handleContactChange}
+                required
+              ></textarea>
+            </div>
+
+            <div className="form-row">
+              <button
+                type="submit"
+                id="contactSubmit"
+                disabled={contactSubmitting}
+              >
+                {contactSubmitting ? "Sending..." : "Send Message"}
+              </button>
+              {contactStatus && (
+                <span
+                  id="contactStatus"
+                  className={`contact-status ${contactStatus.type}`}
+                >
+                  {contactStatus.message}
+                </span>
+              )}
+            </div>
+          </form>
         </div>
       </section>
       <footer className="footer">

@@ -9,6 +9,8 @@ const Admin = () => {
     email: "",
     password: "",
   });
+  const [contacts, setContacts] = useState([]);
+  const [showContacts, setShowContacts] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -54,6 +56,31 @@ const Admin = () => {
       ...credentials,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleViewContacts = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/contact`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const contactsData = await response.json();
+        setContacts(contactsData);
+        setShowContacts(true);
+      } else {
+        setError("Failed to load contact messages");
+      }
+    } catch (error) {
+      console.error("Contact fetch error:", error);
+      setError("Network error. Please try again.");
+    }
   };
 
   if (!isLoggedIn) {
@@ -174,6 +201,20 @@ const Admin = () => {
             </div>
 
             <div className="admin-section">
+              <h2>Contact Messages</h2>
+              <div className="section-actions">
+                <button
+                  className="action-btn primary"
+                  onClick={handleViewContacts}
+                >
+                  View All Messages
+                </button>
+                <button className="action-btn">Recent Messages</button>
+                <button className="action-btn">Reply to Messages</button>
+              </div>
+            </div>
+
+            <div className="admin-section">
               <h2>Reports & Analytics</h2>
               <div className="section-actions">
                 <button className="action-btn primary">Sales Report</button>
@@ -206,6 +247,44 @@ const Admin = () => {
               </div>
             </div>
           </div>
+
+          {/* Contact Messages Display */}
+          {showContacts && (
+            <div className="contacts-section">
+              <div className="section-header">
+                <h2>Contact Messages</h2>
+                <button
+                  className="close-btn"
+                  onClick={() => setShowContacts(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="contacts-list">
+                {contacts.length === 0 ? (
+                  <p>No contact messages yet.</p>
+                ) : (
+                  contacts.map((contact) => (
+                    <div key={contact._id} className="contact-item">
+                      <div className="contact-header">
+                        <strong>{contact.name}</strong>
+                        <span className="contact-email">{contact.email}</span>
+                        <span className="contact-date">
+                          {new Date(contact.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {contact.subject && (
+                        <div className="contact-subject">
+                          <strong>Subject:</strong> {contact.subject}
+                        </div>
+                      )}
+                      <div className="contact-message">{contact.message}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

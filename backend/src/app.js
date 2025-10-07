@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const productsRouter = require("./routes/products");
 const authRouter = require("./routes/auth");
 const ordersRouter = require("./routes/orders");
+const contactRouter = require("./routes/contact");
 const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
@@ -81,6 +82,7 @@ app.get("/", (req, res) =>
 app.use("/api/products", productsRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/contact", contactRouter);
 
 // error handler
 app.use(errorHandler);
