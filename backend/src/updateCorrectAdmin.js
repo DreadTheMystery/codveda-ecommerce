@@ -23,15 +23,22 @@ async function updateCorrectAdmin() {
     let admin = await User.findOne({ email: correctEmail, role: "admin" });
 
     if (!admin) {
-      console.log("❌ Admin account with Gmail not found. Let me check what exists...");
+      console.log(
+        "❌ Admin account with Gmail not found. Let me check what exists..."
+      );
       const allAdmins = await User.find({ role: "admin" });
       console.log("Found admin accounts:");
-      allAdmins.forEach(a => console.log(`- ${a.email} (${a.name})`));
-      
+      allAdmins.forEach((a) => console.log(`- ${a.email} (${a.name})`));
+
       // Try to find the admin without Gmail and update their email
-      const adminWithoutGmail = await User.findOne({ email: "engr.abdulridwan", role: "admin" });
+      const adminWithoutGmail = await User.findOne({
+        email: "engr.abdulridwan",
+        role: "admin",
+      });
       if (adminWithoutGmail) {
-        console.log("🔄 Updating email from engr.abdulridwan to engr.abdulridwan@gmail.com");
+        console.log(
+          "🔄 Updating email from engr.abdulridwan to engr.abdulridwan@gmail.com"
+        );
         adminWithoutGmail.email = correctEmail;
         adminWithoutGmail.name = "Abdulgafar Ridwan";
         adminWithoutGmail.password = newPassword;
@@ -56,23 +63,25 @@ async function updateCorrectAdmin() {
     console.log(`🔑 Password: ${newPassword}`);
     console.log(`👤 Name: ${admin.name}`);
     console.log("═══════════════════════════════════════");
-    console.log("✅ You can now login to your admin panel with these credentials!");
+    console.log(
+      "✅ You can now login to your admin panel with these credentials!"
+    );
     console.log("🎯 Email is now correctly set to @gmail.com");
     console.log("═══════════════════════════════════════\n");
 
     // Clean up any duplicate admin accounts
     console.log("🧹 Cleaning up duplicate admin accounts...");
-    await User.deleteMany({ 
-      email: "engr.abdulridwan", 
+    await User.deleteMany({
+      email: "engr.abdulridwan",
       role: "admin",
-      _id: { $ne: admin._id }
+      _id: { $ne: admin._id },
     });
-    
-    await User.deleteMany({ 
-      email: "secure-owner@private.com", 
-      role: "admin"
+
+    await User.deleteMany({
+      email: "secure-owner@private.com",
+      role: "admin",
     });
-    
+
     console.log("✅ Duplicate accounts removed for security");
 
     await mongoose.disconnect();

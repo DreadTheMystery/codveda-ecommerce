@@ -6,7 +6,9 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "seed": "node src/seed.js",
-    "seed-users": "node src/seedUsers.js"
+    "seed-users": "node src/seedUsers.js",
+    "create-admin": "node src/createProductionAdmin.js",
+    "setup-production": "node src/createProductionAdmin.js && node src/seed.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
