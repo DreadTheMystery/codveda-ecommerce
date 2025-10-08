@@ -1,8 +1,7 @@
 // API Configuration for Production and Development
 export const API_CONFIG = {
   // Use environment variable or fallback to production backend
-  BASE_URL:
-    import.meta.env.VITE_API_URL || "https://codveda-ecommerce.onrender.com",
+  BASE_URL: import.meta.env.VITE_API_URL || "https://nafsykay.onrender.com",
 
   // API endpoints
   ENDPOINTS: {

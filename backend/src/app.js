@@ -1,7 +1,11 @@
-require("dotenv").config();
+// require("dotenv").config();
+const path = require("path");
+// load backend/.env no matter where you start the process from
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
+const { sequelize, testConnection } = require("./config/database");
 const productsRouter = require("./routes/products");
 const authRouter = require("./routes/auth");
 const ordersRouter = require("./routes/orders");
@@ -10,7 +14,7 @@ const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const MONGO_URI = process.env.MONGO_URI;
+const DATABASE_URL = process.env.DATABASE_URL;
 
 // CORS configuration for production
 const corsOptions = {
@@ -88,18 +92,31 @@ app.use("/api/contact", contactRouter);
 app.use(errorHandler);
 
 async function start() {
-  if (!MONGO_URI) {
-    console.error("MONGO_URI not set in .env");
+  // Check for database configuration
+  const isProduction = process.env.NODE_ENV === "production";
+  if (isProduction && !DATABASE_URL) {
+    console.error("DATABASE_URL not set for production environment");
     process.exit(1);
   }
+
   try {
-    await mongoose.connect(MONGO_URI, { dbName: undefined }); // dbName can be part of URI
-    console.log("Connected to MongoDB.");
+    // Test database connection
+    await testConnection();
+
+    // Sync database models (creates tables if they don't exist)
+    await sequelize.sync({ alter: true });
+    console.log("✅ Database synchronized successfully.");
+
     app.listen(PORT, () => {
-      console.log(`Server started on http://localhost:${PORT}`);
+      console.log(`🚀 Server started on http://localhost:${PORT}`);
+      console.log(
+        `📂 Database: ${
+          isProduction ? "PostgreSQL (Production)" : "SQLite (Development)"
+        }`
+      );
     });
   } catch (err) {
-    console.error("Failed to start server:", err);
+    console.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 }

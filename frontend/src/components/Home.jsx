@@ -461,13 +461,7 @@ const Home = () => {
         <div className="container">
           <nav className="navbar">
             <div className="nav-brand">
-              <Link to="/">
-                <img
-                  src="/frontend/src/Gemini_Generated_Image_pj5gw7pj5gw7pj5g.png"
-                  alt=""
-                />
-                NAFSYKAY COLLECTION
-              </Link>
+              <Link to="/">NAFSYKAY COLLECTION</Link>
             </div>
 
             {/* Mobile cart icon - always visible */}
@@ -596,19 +590,19 @@ const Home = () => {
         <div className="hero-slides">
           <div
             className="hero-slide active"
-            data-bg="/frontend/src//1.png"
+            style={{ backgroundImage: `url('/src/1.png')` }}
           ></div>
           <div
             className="hero-slide"
-            data-bg="url('https://images.unsplash.com/photo-1583391733956-6c78276477e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
+            style={{ backgroundImage: `url('/src/2.png')` }}
           ></div>
           <div
             className="hero-slide"
-            data-bg="url('https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
+            style={{ backgroundImage: `url('/src/3.png')` }}
           ></div>
           <div
             className="hero-slide"
-            data-bg="url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
+            style={{ backgroundImage: `url('/src/4.png')` }}
           ></div>
         </div>
         <div className="hero-overlay"></div>

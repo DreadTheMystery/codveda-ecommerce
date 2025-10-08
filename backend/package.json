@@ -5,19 +5,22 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "seed": "node src/seed.js",
+    "seed": "node src/seedProducts.js",
     "seed-users": "node src/seedUsers.js",
-    "create-admin": "node src/createProductionAdmin.js",
-    "setup-production": "node src/createProductionAdmin.js && node src/seed.js"
+    "create-admin": "node src/createAdmin.js",
+    "seed-products": "node src/seedProducts.js",
+    "setup-production": "node src/createAdmin.js && node src/seedProducts.js",
+    "build": "./deploy.sh"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
-    "express": "^4.18.2",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.20.0",
-    "mongoose": "^8.18.2"
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"

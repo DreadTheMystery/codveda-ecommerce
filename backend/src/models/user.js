@@ -1,75 +1,90 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
+const { sequelize } = require("../config/database");
 
-const userSchema = new mongoose.Schema(
+const User = sequelize.define(
+  "User",
   {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
     email: {
-      type: String,
-      required: true,
+      type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
-      trim: true,
-      lowercase: true,
+      validate: {
+        isEmail: true,
+      },
+      set(value) {
+        this.setDataValue("email", value.toLowerCase().trim());
+      },
     },
     password: {
-      type: String,
-      required: true,
-      minlength: 6,
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: [6, 255],
+      },
     },
     name: {
-      type: String,
-      required: true,
-      trim: true,
+      type: DataTypes.STRING,
+      allowNull: false,
+      set(value) {
+        this.setDataValue("name", value.trim());
+      },
     },
     phone: {
-      type: String,
-      trim: true,
+      type: DataTypes.STRING,
+      allowNull: true,
+      set(value) {
+        this.setDataValue("phone", value ? value.trim() : null);
+      },
     },
     address: {
-      street: { type: String, trim: true },
-      city: { type: String, trim: true },
-      state: { type: String, trim: true },
-      zipCode: { type: String, trim: true },
-      country: { type: String, trim: true, default: "Nigeria" },
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: {
+        street: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        country: "Nigeria",
+      },
     },
     role: {
-      type: String,
-      enum: ["customer", "admin"],
-      default: "customer",
+      type: DataTypes.ENUM("customer", "admin"),
+      defaultValue: "customer",
     },
     isActive: {
-      type: Boolean,
-      default: true,
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
   },
   {
-    collection: "users",
+    tableName: "users",
     timestamps: true,
+    hooks: {
+      beforeSave: async (user) => {
+        if (user.changed("password")) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+    },
   }
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
-});
-
-// Compare password method
-userSchema.methods.comparePassword = async function (candidatePassword) {
+// Instance methods
+User.prototype.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON output
-userSchema.methods.toJSON = function () {
-  const user = this.toObject();
+User.prototype.toJSON = function () {
+  const user = { ...this.get() };
   delete user.password;
   return user;
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = User;

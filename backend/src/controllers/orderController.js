@@ -1,6 +1,7 @@
 const Order = require("../models/order");
 const Product = require("../models/product");
 const User = require("../models/user");
+const { sequelize } = require("../config/database");
 
 // Create new order
 exports.createOrder = async (req, res, next) => {
@@ -28,7 +29,7 @@ exports.createOrder = async (req, res, next) => {
     }
 
     // Get user details
-    const user = await User.findById(req.userId);
+    const user = await User.findByPk(req.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -45,7 +46,7 @@ exports.createOrder = async (req, res, next) => {
       }
 
       // Get product details
-      const product = await Product.findById(item.product);
+      const product = await Product.findByPk(item.product);
       if (!product) {
         return res.status(404).json({
           error: `Product with ID ${item.product} not found`,
@@ -61,7 +62,7 @@ exports.createOrder = async (req, res, next) => {
 
       // Prepare order item
       const orderItem = {
-        product: product._id,
+        product: product.id,
         name: product.name,
         price: product.price,
         quantity: item.quantity,
@@ -69,12 +70,12 @@ exports.createOrder = async (req, res, next) => {
       };
 
       orderItems.push(orderItem);
-      totalAmount += product.price * item.quantity;
+      totalAmount += parseFloat(product.price) * parseInt(item.quantity);
     }
 
     // Create order
-    const order = new Order({
-      user: req.userId,
+    const order = await Order.create({
+      userId: req.userId,
       items: orderItems,
       totalAmount,
       shippingAddress,
@@ -82,26 +83,28 @@ exports.createOrder = async (req, res, next) => {
       notes,
     });
 
-    // Calculate total (in case we want to add shipping, tax, etc. later)
-    order.calculateTotal();
-
-    await order.save();
-
     // Update product stock
     for (const item of items) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: -item.quantity },
-      });
+      await Product.update(
+        { stock: sequelize.literal(`stock - ${item.quantity}`) },
+        { where: { id: item.product } }
+      );
     }
 
-    // Populate the order with product details
-    const populatedOrder = await Order.findById(order._id)
-      .populate("user", "name email phone")
-      .populate("items.product", "name category");
+    // Get the created order with user details
+    const orderWithUser = await Order.findByPk(order.id, {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email", "phone"],
+        },
+      ],
+    });
 
     res.status(201).json({
       message: "Order created successfully",
-      order: populatedOrder,
+      order: orderWithUser,
     });
   } catch (error) {
     next(error);
@@ -113,22 +116,28 @@ exports.getUserOrders = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    const orders = await Order.find({ user: req.userId })
-      .populate("items.product", "name category")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const totalOrders = await Order.countDocuments({ user: req.userId });
+    const { count, rows: orders } = await Order.findAndCountAll({
+      where: { userId: req.userId },
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email", "phone"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      offset,
+      limit,
+    });
 
     res.json({
       orders,
       pagination: {
         currentPage: page,
-        totalPages: Math.ceil(totalOrders / limit),
-        totalOrders,
+        totalPages: Math.ceil(count / limit),
+        totalOrders: count,
       },
     });
   } catch (error) {
@@ -139,17 +148,23 @@ exports.getUserOrders = async (req, res, next) => {
 // Get single order
 exports.getOrder = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id)
-      .populate("user", "name email phone")
-      .populate("items.product", "name category description");
+    const order = await Order.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email", "phone"],
+        },
+      ],
+    });
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
 
     // Check if user owns this order (or is admin)
-    if (order.user._id.toString() !== req.userId) {
-      const user = await User.findById(req.userId);
+    if (order.userId !== req.userId) {
+      const user = await User.findByPk(req.userId);
       if (!user || user.role !== "admin") {
         return res.status(403).json({ error: "Access denied" });
       }
@@ -178,22 +193,29 @@ exports.updateOrderStatus = async (req, res, next) => {
     }
 
     // Check if user is admin
-    const user = await User.findById(req.userId);
+    const user = await User.findByPk(req.userId);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ error: "Admin access required" });
     }
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
+    const [updatedRows] = await Order.update(
       { status },
-      { new: true, runValidators: true }
-    )
-      .populate("user", "name email phone")
-      .populate("items.product", "name category");
+      { where: { id: req.params.id } }
+    );
 
-    if (!order) {
+    if (updatedRows === 0) {
       return res.status(404).json({ error: "Order not found" });
     }
+
+    const order = await Order.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email", "phone"],
+        },
+      ],
+    });
 
     res.json({
       message: "Order status updated successfully",
@@ -208,37 +230,42 @@ exports.updateOrderStatus = async (req, res, next) => {
 exports.getAllOrders = async (req, res, next) => {
   try {
     // Check if user is admin
-    const user = await User.findById(req.userId);
+    const user = await User.findByPk(req.userId);
     if (!user || user.role !== "admin") {
       return res.status(403).json({ error: "Admin access required" });
     }
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
     const status = req.query.status;
 
-    // Build query
-    let query = {};
+    // Build where clause
+    let whereClause = {};
     if (status) {
-      query.status = status;
+      whereClause.status = status;
     }
 
-    const orders = await Order.find(query)
-      .populate("user", "name email phone")
-      .populate("items.product", "name category")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const totalOrders = await Order.countDocuments(query);
+    const { count, rows: orders } = await Order.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email", "phone"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      offset,
+      limit,
+    });
 
     res.json({
       orders,
       pagination: {
         currentPage: page,
-        totalPages: Math.ceil(totalOrders / limit),
-        totalOrders,
+        totalPages: Math.ceil(count / limit),
+        totalOrders: count,
       },
     });
   } catch (error) {
@@ -249,14 +276,14 @@ exports.getAllOrders = async (req, res, next) => {
 // Cancel order
 exports.cancelOrder = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findByPk(req.params.id);
 
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
 
     // Check if user owns this order
-    if (order.user.toString() !== req.userId) {
+    if (order.userId !== req.userId) {
       return res.status(403).json({ error: "Access denied" });
     }
 
@@ -273,18 +300,25 @@ exports.cancelOrder = async (req, res, next) => {
 
     // Restore product stock
     for (const item of order.items) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stock: item.quantity },
-      });
+      await Product.update(
+        { stock: sequelize.literal(`stock + ${item.quantity}`) },
+        { where: { id: item.product } }
+      );
     }
 
-    const populatedOrder = await Order.findById(order._id)
-      .populate("user", "name email phone")
-      .populate("items.product", "name category");
+    const orderWithUser = await Order.findByPk(order.id, {
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["name", "email", "phone"],
+        },
+      ],
+    });
 
     res.json({
       message: "Order cancelled successfully",
-      order: populatedOrder,
+      order: orderWithUser,
     });
   } catch (error) {
     next(error);

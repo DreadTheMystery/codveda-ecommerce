@@ -2,7 +2,9 @@ const Product = require("../models/product");
 
 exports.getAll = async (req, res, next) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
+    const products = await Product.findAll({
+      order: [["createdAt", "DESC"]],
+    });
     res.json(products);
   } catch (err) {
     next(err);
@@ -11,7 +13,7 @@ exports.getAll = async (req, res, next) => {
 
 exports.getOne = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ error: "Not found" });
     res.json(product);
   } catch (err) {
@@ -25,7 +27,7 @@ exports.create = async (req, res, next) => {
     if (!name || typeof price === "undefined") {
       return res.status(400).json({ error: "name and price required" });
     }
-    const p = new Product({
+    const product = await Product.create({
       name,
       description,
       price,
@@ -33,8 +35,7 @@ exports.create = async (req, res, next) => {
       category,
       stock,
     });
-    await p.save();
-    res.status(201).json(p);
+    res.status(201).json(product);
   } catch (err) {
     next(err);
   }
@@ -43,11 +44,16 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const updates = req.body;
-    const product = await Product.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
-      runValidators: true,
+    const [updatedRows] = await Product.update(updates, {
+      where: { id: req.params.id },
+      returning: true,
     });
-    if (!product) return res.status(404).json({ error: "Not found" });
+
+    if (updatedRows === 0) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
+    const product = await Product.findByPk(req.params.id);
     res.json(product);
   } catch (err) {
     next(err);
@@ -56,8 +62,10 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ error: "Not found" });
+
+    await product.destroy();
     res.json({ message: "Deleted" });
   } catch (err) {
     next(err);

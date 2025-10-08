@@ -1,86 +1,95 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database");
+const User = require("./user");
+const Product = require("./product");
 
-const orderItemSchema = new mongoose.Schema({
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true,
-  },
-  name: { type: String, required: true }, // Store product name at time of order
-  price: { type: Number, required: true }, // Store price at time of order
-  quantity: { type: Number, required: true, min: 1 },
-  image_url: { type: String, default: "" },
-});
-
-const orderSchema = new mongoose.Schema(
+const Order = sequelize.define(
+  "Order",
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "id",
+      },
     },
     orderNumber: {
-      type: String,
+      type: DataTypes.STRING,
       unique: true,
+      allowNull: true,
     },
-    items: [orderItemSchema],
+    items: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: [],
+    },
     totalAmount: {
-      type: Number,
-      required: true,
-      min: 0,
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      validate: {
+        min: 0,
+      },
     },
     status: {
-      type: String,
-      enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
-      default: "pending",
+      type: DataTypes.ENUM(
+        "pending",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled"
+      ),
+      defaultValue: "pending",
     },
     shippingAddress: {
-      name: { type: String, required: true },
-      phone: { type: String, required: true },
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      zipCode: { type: String, required: true },
-      country: { type: String, default: "Nigeria" },
+      type: DataTypes.JSONB,
+      allowNull: false,
     },
     paymentMethod: {
-      type: String,
-      enum: ["cash_on_delivery", "bank_transfer", "card"],
-      default: "cash_on_delivery",
+      type: DataTypes.ENUM("cash_on_delivery", "bank_transfer", "card"),
+      defaultValue: "cash_on_delivery",
     },
     paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
+      type: DataTypes.ENUM("pending", "paid", "failed", "refunded"),
+      defaultValue: "pending",
     },
     notes: {
-      type: String,
-      trim: true,
+      type: DataTypes.TEXT,
+      allowNull: true,
+      set(value) {
+        this.setDataValue("notes", value ? value.trim() : null);
+      },
     },
   },
   {
-    collection: "orders",
+    tableName: "orders",
     timestamps: true,
+    hooks: {
+      beforeCreate: (order) => {
+        if (!order.orderNumber) {
+          const timestamp = Date.now().toString();
+          const random = Math.floor(Math.random() * 1000)
+            .toString()
+            .padStart(3, "0");
+          order.orderNumber = `CVE-${timestamp.slice(-8)}${random}`;
+        }
+      },
+    },
   }
 );
 
-// Generate order number before saving
-orderSchema.pre("save", async function (next) {
-  if (!this.orderNumber) {
-    const timestamp = Date.now().toString();
-    const random = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0");
-    this.orderNumber = `CVE-${timestamp.slice(-8)}${random}`;
-  }
-  next();
-});
-
-// Calculate total amount from items
-orderSchema.methods.calculateTotal = function () {
+// Instance methods
+Order.prototype.calculateTotal = function () {
   this.totalAmount = this.items.reduce((total, item) => {
-    return total + item.price * item.quantity;
+    return total + parseFloat(item.price) * parseInt(item.quantity);
   }, 0);
 };
 
-module.exports = mongoose.model("Order", orderSchema);
+// Note: Associations will be defined in models/index.js to avoid circular dependencies
+
+module.exports = Order;

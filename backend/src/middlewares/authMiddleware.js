@@ -20,7 +20,7 @@ const authMiddleware = async (req, res, next) => {
       );
 
       // Get user from token
-      const user = await User.findById(decoded.userId).select("-password");
+      const user = await User.findByPk(decoded.userId);
       if (!user || !user.isActive) {
         return res.status(401).json({
           error: "Access denied. User not found or inactive.",

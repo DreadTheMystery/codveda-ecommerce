@@ -27,7 +27,7 @@ exports.register = async (req, res, next) => {
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
         error: "User with this email already exists",
@@ -35,7 +35,7 @@ exports.register = async (req, res, next) => {
     }
 
     // Create new user
-    const user = new User({
+    const user = await User.create({
       email,
       password,
       name,
@@ -43,10 +43,8 @@ exports.register = async (req, res, next) => {
       address,
     });
 
-    await user.save();
-
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.status(201).json({
       message: "User registered successfully",
@@ -71,7 +69,12 @@ exports.login = async (req, res, next) => {
     }
 
     // Find user
-    const user = await User.findOne({ email, isActive: true });
+    const user = await User.findOne({
+      where: {
+        email,
+        isActive: true,
+      },
+    });
     if (!user) {
       return res.status(401).json({
         error: "Invalid email or password",
@@ -87,7 +90,7 @@ exports.login = async (req, res, next) => {
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.json({
       message: "Login successful",
@@ -102,7 +105,7 @@ exports.login = async (req, res, next) => {
 // Get current user profile
 exports.getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findByPk(req.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -118,15 +121,19 @@ exports.updateProfile = async (req, res, next) => {
   try {
     const { name, phone, address } = req.body;
 
-    const user = await User.findByIdAndUpdate(
-      req.userId,
+    const [updatedRows] = await User.update(
       { name, phone, address },
-      { new: true, runValidators: true }
+      {
+        where: { id: req.userId },
+        returning: true,
+      }
     );
 
-    if (!user) {
+    if (updatedRows === 0) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    const user = await User.findByPk(req.userId);
 
     res.json({
       message: "Profile updated successfully",
@@ -154,7 +161,7 @@ exports.changePassword = async (req, res, next) => {
       });
     }
 
-    const user = await User.findById(req.userId).select("+password");
+    const user = await User.findByPk(req.userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

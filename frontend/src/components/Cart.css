@@ -1,8 +1,21 @@
 /* Cart Page Styles */
 .cart-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--cream-white);
     padding: 2rem 0;
+}
+
+:root {
+    /* NAFSYKAY Brand Colors */
+    --primary-gold: #C8860D;
+    --secondary-brown: #8B6F47;
+    --light-beige: #E8D5B7;
+    --deep-brown: #4A3429;
+    --cream-white: #FAF7F2;
+    --pure-white: #FFFFFF;
+    --text-dark: #2C1810;
+    --gold-gradient: linear-gradient(135deg, #C8860D 0%, #E6A827 100%);
+    --brown-gradient: linear-gradient(135deg, #8B6F47 0%, #A0845C 100%);
 }
 
 .cart-header {
@@ -10,44 +23,46 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--pure-white);
     backdrop-filter: blur(10px);
     padding: 1.5rem 2rem;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(200, 134, 13, 0.15);
+    border: 1px solid rgba(200, 134, 13, 0.2);
 }
 
 .cart-header h1 {
-    color: #2c3e50;
+    color: var(--deep-brown);
     font-size: 2rem;
     font-weight: 700;
     margin: 0;
 }
 
 .continue-shopping {
-    color: #667eea;
+    color: var(--primary-gold);
     text-decoration: none;
     font-weight: 600;
     padding: 0.75rem 1.5rem;
-    border: 2px solid #667eea;
+    border: 2px solid var(--primary-gold);
     border-radius: 25px;
     transition: all 0.3s ease;
 }
 
 .continue-shopping:hover {
-    background: #667eea;
-    color: white;
+    background: var(--gold-gradient);
+    color: var(--pure-white);
     transform: translateY(-2px);
 }
 
 /* Empty Cart */
 .empty-cart {
     text-align: center;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--pure-white);
     backdrop-filter: blur(10px);
     padding: 4rem 2rem;
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(200, 134, 13, 0.15);
+    border: 1px solid rgba(200, 134, 13, 0.2);
 }
 
 .empty-cart-icon {
@@ -56,21 +71,21 @@
 }
 
 .empty-cart h2 {
-    color: #2c3e50;
+    color: var(--deep-brown);
     font-size: 1.8rem;
     margin-bottom: 1rem;
 }
 
 .empty-cart p {
-    color: #6c757d;
+    color: var(--secondary-brown);
     font-size: 1.1rem;
     margin-bottom: 2rem;
 }
 
 .shop-now-btn {
     display: inline-block;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    color: white;
+    background: var(--gold-gradient);
+    color: var(--pure-white);
     padding: 1rem 2rem;
     text-decoration: none;
     border-radius: 25px;
@@ -80,7 +95,7 @@
 
 .shop-now-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(200, 134, 13, 0.3);
 }
 
 /* Cart Content */
@@ -92,11 +107,12 @@
 
 /* Cart Items */
 .cart-items {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--pure-white);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(200, 134, 13, 0.15);
+    border: 1px solid rgba(200, 134, 13, 0.2);
 }
 
 .cart-items-header {
@@ -105,11 +121,11 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid var(--light-beige);
 }
 
 .cart-items-header h2 {
-    color: #2c3e50;
+    color: var(--deep-brown);
     font-size: 1.5rem;
     margin: 0;
 }
@@ -137,7 +153,7 @@
     gap: 1.5rem;
     align-items: center;
     padding: 1.5rem 0;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--light-beige);
 }
 
 .cart-item:last-child {
@@ -153,14 +169,14 @@
 }
 
 .item-details h3 {
-    color: #2c3e50;
+    color: var(--deep-brown);
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
 }
 
 .item-category {
-    color: #667eea;
+    color: var(--primary-gold);
     font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -171,7 +187,7 @@
 .item-price {
     font-size: 1.1rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: var(--gold-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -188,7 +204,7 @@
 .item-quantity label {
     display: block;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--deep-brown);
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
 }
@@ -197,14 +213,14 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: #f8f9fa;
+    background: var(--cream-white);
     border-radius: 8px;
     padding: 0.5rem;
 }
 
 .quantity-controls button {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    background: var(--gold-gradient);
+    color: var(--pure-white);
     border: none;
     width: 32px;
     height: 32px;
@@ -223,8 +239,8 @@
 }
 
 .quantity-controls button:disabled {
-    background: #e9ecef;
-    color: #6c757d;
+    background: var(--light-beige);
+    color: var(--secondary-brown);
     cursor: not-allowed;
     transform: none;
 }
@@ -232,7 +248,7 @@
 .quantity-display {
     font-size: 1rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--deep-brown);
     min-width: 30px;
     text-align: center;
 }
@@ -245,7 +261,7 @@
 .item-subtotal {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--deep-brown);
     margin-bottom: 1rem;
 }
 
@@ -274,15 +290,16 @@
 }
 
 .order-summary {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--pure-white);
     backdrop-filter: blur(10px);
     padding: 1.5rem;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(200, 134, 13, 0.15);
+    border: 1px solid rgba(200, 134, 13, 0.2);
 }
 
 .order-summary h3 {
-    color: #2c3e50;
+    color: var(--deep-brown);
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 1rem;
@@ -297,12 +314,12 @@
 }
 
 .summary-row.total {
-    border-top: 2px solid #e9ecef;
+    border-top: 2px solid var(--light-beige);
     padding-top: 1rem;
     margin-top: 1rem;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--deep-brown);
 }
 
 .free-shipping {
@@ -312,15 +329,16 @@
 
 /* Shipping Form */
 .shipping-form {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--pure-white);
     backdrop-filter: blur(10px);
     padding: 1.5rem;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(200, 134, 13, 0.15);
+    border: 1px solid rgba(200, 134, 13, 0.2);
 }
 
 .shipping-form h3 {
-    color: #2c3e50;
+    color: var(--deep-brown);
     font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 1rem;
@@ -339,7 +357,7 @@
 .shipping-form input {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid var(--light-beige);
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.3s ease;
@@ -347,19 +365,19 @@
 
 .shipping-form input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 3px rgba(200, 134, 13, 0.1);
 }
 
 .shipping-form input::placeholder {
-    color: #adb5bd;
+    color: var(--secondary-brown);
 }
 
 /* Place Order Button */
 .place-order-btn {
     width: 100%;
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
+    background: var(--gold-gradient);
+    color: var(--pure-white);
     border: none;
     padding: 1rem 2rem;
     border-radius: 12px;
@@ -369,17 +387,17 @@
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 15px rgba(200, 134, 13, 0.3);
 }
 
 .place-order-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+    box-shadow: 0 8px 25px rgba(200, 134, 13, 0.4);
 }
 
 .place-order-btn:disabled {
-    background: #e9ecef;
-    color: #6c757d;
+    background: var(--light-beige);
+    color: var(--secondary-brown);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
