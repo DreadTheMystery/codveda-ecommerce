@@ -1,6 +1,6 @@
-# 🛍️ CodVeda E-Commerce Platform
+# 🛍️ CodVeda Islamic & African Fashion Platform
 
-A modern, full-stack e-commerce application built with Node.js, Express, MongoDB, and vanilla JavaScript. Features a professional admin panel for product management and a beautiful customer-facing storefront.
+A modern, full-stack e-commerce application specializing in authentic Islamic and African fashion. Built with Node.js, Express, MongoDB, and vanilla JavaScript. Features a professional admin panel for product management and a beautiful customer-facing storefront showcasing premium Islamic and African attire.
 
 ## 🚀 Features
 
@@ -9,7 +9,7 @@ A modern, full-stack e-commerce application built with Node.js, Express, MongoDB
 - **Modern UI/UX**: Beautiful gradient design with smooth animations
 - **Responsive Design**: Perfect experience on desktop, tablet, and mobile
 - **Product Browsing**: Grid layout with 3 products per line (responsive)
-- **Category Filtering**: Filter products by category (T-Shirts, Hoodies, Shoes, etc.)
+- **Category Filtering**: Filter products by category (Abaya, Hijab, Ankara, Jallabiya, etc.)
 - **Product Details**: High-quality images, descriptions, pricing, and stock status
 - **Add to Cart**: Interactive cart functionality with notifications
 - **Stock Awareness**: Real-time stock status (In Stock, Low Stock, Out of Stock)

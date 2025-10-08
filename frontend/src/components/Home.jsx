@@ -76,6 +76,65 @@ const Home = () => {
     };
   }, []);
 
+  // Hero slideshow functionality
+  useEffect(() => {
+    let slideInterval;
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll(".hero-slide");
+    const indicators = document.querySelectorAll(".indicator");
+    const totalSlides = slides.length;
+
+    const changeSlide = (index) => {
+      // Remove active class from all slides and indicators
+      slides.forEach((slide) => slide.classList.remove("active"));
+      indicators.forEach((indicator) => indicator.classList.remove("active"));
+
+      // Add active class to current slide and indicator
+      if (slides[index]) {
+        slides[index].classList.add("active");
+        const bgUrl = slides[index].getAttribute("data-bg");
+        slides[index].style.backgroundImage = bgUrl;
+      }
+      if (indicators[index]) {
+        indicators[index].classList.add("active");
+      }
+    };
+
+    const nextSlide = () => {
+      currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+      changeSlide(currentSlideIndex);
+    };
+
+    // Initialize first slide
+    if (slides.length > 0) {
+      changeSlide(0);
+
+      // Auto-advance slides every 4 seconds
+      slideInterval = setInterval(nextSlide, 4000);
+    }
+
+    // Add click handlers to indicators
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener("click", () => {
+        currentSlideIndex = index;
+        changeSlide(index);
+        // Reset interval when manually changing slides
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, 4000);
+      });
+    });
+
+    return () => {
+      if (slideInterval) {
+        clearInterval(slideInterval);
+      }
+      // Remove event listeners
+      indicators.forEach((indicator, index) => {
+        indicator.removeEventListener("click", () => {});
+      });
+    };
+  }, []);
+
   // Authentication functions
   const initAuth = () => {
     const token = localStorage.getItem("token");
@@ -402,7 +461,13 @@ const Home = () => {
         <div className="container">
           <nav className="navbar">
             <div className="nav-brand">
-              <Link to="/">CODVEDA</Link>
+              <Link to="/">
+                <img
+                  src="/frontend/src/Gemini_Generated_Image_pj5gw7pj5gw7pj5g.png"
+                  alt=""
+                />
+                NAFSYKAY COLLECTION
+              </Link>
             </div>
 
             {/* Mobile cart icon - always visible */}
@@ -527,23 +592,55 @@ const Home = () => {
           </nav>
         </div>
       </header>{" "}
-      <section id="hero" className="hero">
-        <div className="container">
-          <h1>Premium Fashion Collection</h1>
-          <p>
-            Discover the latest trends in clothing with our carefully curated
-            collection of premium fashion items
-          </p>
-          <a href="#products" className="cta-button">
-            Shop Now
-          </a>
+      <section id="hero" className="hero hero-slideshow">
+        <div className="hero-slides">
+          <div
+            className="hero-slide active"
+            data-bg="/frontend/src//1.png"
+          ></div>
+          <div
+            className="hero-slide"
+            data-bg="url('https://images.unsplash.com/photo-1583391733956-6c78276477e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
+          ></div>
+          <div
+            className="hero-slide"
+            data-bg="url('https://images.unsplash.com/photo-1434389677669-e08b4cac3105?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
+          ></div>
+          <div
+            className="hero-slide"
+            data-bg="url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')"
+          ></div>
+        </div>
+        <div className="hero-overlay"></div>
+        <div className="container hero-content">
+          <div className="hero-text">
+            <h1>NAFSYKAY COLLECTION</h1>
+            <h2>Premium Islamic & African Fashion</h2>
+            <p>
+              Discover authentic traditional and modern Islamic clothing with
+              our carefully curated collection of Abayas, Jallabiya, Ankara, and
+              beautiful African fashion
+            </p>
+            <a href="#products" className="cta-button">
+              Shop Now
+            </a>
+          </div>
+        </div>
+        <div className="slideshow-indicators">
+          <span className="indicator active" data-slide="0"></span>
+          <span className="indicator" data-slide="1"></span>
+          <span className="indicator" data-slide="2"></span>
+          <span className="indicator" data-slide="3"></span>
         </div>
       </section>
       <section id="products" className="products-section">
         <div className="container">
           <div className="section-title">
-            <h2>Our Products</h2>
-            <p>Explore our amazing collection of high-quality clothing items</p>
+            <h2>Our Collection</h2>
+            <p>
+              Explore our authentic Islamic and African fashion pieces crafted
+              with tradition and elegance
+            </p>
           </div>
 
           <div className="filters">
@@ -557,43 +654,75 @@ const Home = () => {
             </button>
             <button
               className={`filter-btn ${
-                currentFilter === "T-Shirts" ? "active" : ""
+                currentFilter === "Abaya" ? "active" : ""
               }`}
-              onClick={() => filterProducts("T-Shirts")}
+              onClick={() => filterProducts("Abaya")}
             >
-              T-Shirts
+              Abaya Egypt & Dubai
             </button>
             <button
               className={`filter-btn ${
-                currentFilter === "Hoodies" ? "active" : ""
+                currentFilter === "Jallabiya" ? "active" : ""
               }`}
-              onClick={() => filterProducts("Hoodies")}
+              onClick={() => filterProducts("Jallabiya")}
             >
-              Hoodies
+              Jallabiya
             </button>
             <button
               className={`filter-btn ${
-                currentFilter === "Shoes" ? "active" : ""
+                currentFilter === "Ankara" ? "active" : ""
               }`}
-              onClick={() => filterProducts("Shoes")}
+              onClick={() => filterProducts("Ankara")}
             >
-              Shoes
+              Ankara
             </button>
             <button
               className={`filter-btn ${
-                currentFilter === "Pants" ? "active" : ""
+                currentFilter === "Laces" ? "active" : ""
               }`}
-              onClick={() => filterProducts("Pants")}
+              onClick={() => filterProducts("Laces")}
             >
-              Pants
+              Laces
             </button>
             <button
               className={`filter-btn ${
-                currentFilter === "Accessories" ? "active" : ""
+                currentFilter === "Kampala" ? "active" : ""
               }`}
-              onClick={() => filterProducts("Accessories")}
+              onClick={() => filterProducts("Kampala")}
             >
-              Accessories
+              Kampala
+            </button>
+            <button
+              className={`filter-btn ${
+                currentFilter === "Shedda" ? "active" : ""
+              }`}
+              onClick={() => filterProducts("Shedda")}
+            >
+              Shedda
+            </button>
+            <button
+              className={`filter-btn ${
+                currentFilter === "Veils" ? "active" : ""
+              }`}
+              onClick={() => filterProducts("Veils")}
+            >
+              Veils
+            </button>
+            <button
+              className={`filter-btn ${
+                currentFilter === "Hijab" ? "active" : ""
+              }`}
+              onClick={() => filterProducts("Hijab")}
+            >
+              Hijab
+            </button>
+            <button
+              className={`filter-btn ${
+                currentFilter === "Caps" ? "active" : ""
+              }`}
+              onClick={() => filterProducts("Caps")}
+            >
+              Caps
             </button>
           </div>
 
@@ -687,19 +816,21 @@ const Home = () => {
           <div className="about-grid">
             <div className="about-text">
               <p>
-                <strong>CodVeda</strong> is a modern, lightweight e-commerce
-                storefront and admin demo built with Node.js, Express and
-                MongoDB. We focus on simple, usable shopping experiences and a
-                clear admin panel to manage products and inventory.
+                <strong>CodVeda</strong> is your premier destination for
+                authentic Islamic and African fashion. We specialize in
+                traditional and contemporary modest clothing, bringing you the
+                finest Abayas from Egypt and Dubai, beautiful Ankara prints,
+                elegant Jallabiya, and quality Islamic wear.
               </p>
 
-              <p>What makes CodVeda different:</p>
+              <p>What makes CodVeda special:</p>
               <ul>
-                <li>Clean, responsive UI for customers</li>
-                <li>Simple admin CRUD for product management</li>
+                <li>Authentic Islamic and African fashion pieces</li>
+                <li>High-quality materials and traditional craftsmanship</li>
                 <li>
-                  Designed as a learning / portfolio project — easy to extend
+                  Wide range from everyday wear to special occasion outfits
                 </li>
+                <li>Modest fashion that celebrates culture and faith</li>
               </ul>
               <p className="muted">
                 Built by <em>DreadTheMystery</em>. Check source code or
@@ -709,16 +840,16 @@ const Home = () => {
 
             <div className="about-stats">
               <div className="stat">
-                <div className="stat-number">3+</div>
-                <div className="stat-label">Categories</div>
+                <div className="stat-number">9+</div>
+                <div className="stat-label">Fashion Categories</div>
               </div>
               <div className="stat">
-                <div className="stat-number">30+</div>
-                <div className="stat-label">Sample products</div>
+                <div className="stat-number">100+</div>
+                <div className="stat-label">Islamic & African Styles</div>
               </div>
               <div className="stat">
-                <div className="stat-number">Admin</div>
-                <div className="stat-label">CRUD ready</div>
+                <div className="stat-number">Premium</div>
+                <div className="stat-label">Quality Materials</div>
               </div>
             </div>
           </div>
@@ -807,7 +938,8 @@ const Home = () => {
       <footer className="footer">
         <div className="container">
           <p>
-            &copy; 2025 CodVeda Clothing Shop. Made with ❤️ for fashion lovers.
+            &copy; 2025 CodVeda Islamic & African Fashion. Made with ❤️ for
+            authentic style.
           </p>
         </div>
       </footer>

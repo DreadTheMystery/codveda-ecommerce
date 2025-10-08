@@ -4,7 +4,9 @@ const User = require("./models/user");
 
 async function fixProductionAdmin() {
   console.log("🔧 Fixing Production Admin Login Issue");
-  console.log("This will ensure your admin works on both local and production\n");
+  console.log(
+    "This will ensure your admin works on both local and production\n"
+  );
 
   const uri = process.env.MONGO_URI;
   if (!uri) {
@@ -24,8 +26,8 @@ async function fixProductionAdmin() {
     // Check for existing admins with different emails
     const possibleEmails = [
       "engr.abdulridwan@gmail.com",
-      "abdulgafarridwan@gmail.com", 
-      "engr.abdulridwan"
+      "abdulgafarridwan@gmail.com",
+      "engr.abdulridwan",
     ];
 
     console.log("🔍 Checking for existing admin accounts...");
@@ -57,7 +59,7 @@ async function fixProductionAdmin() {
         phone: "+234 000 000 0000",
         address: {
           street: "Admin Address",
-          city: "Lagos", 
+          city: "Lagos",
           state: "Lagos State",
           zipCode: "100001",
           country: "Nigeria",
@@ -72,7 +74,7 @@ async function fixProductionAdmin() {
     // Clean up any duplicate admin accounts
     await User.deleteMany({
       role: "admin",
-      _id: { $ne: foundAdmin._id }
+      _id: { $ne: foundAdmin._id },
     });
 
     console.log("\n═══════════════════════════════════════");

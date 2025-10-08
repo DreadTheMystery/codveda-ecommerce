@@ -14,44 +14,99 @@ async function seed() {
 
     const sample = [
       {
-        name: "White T-Shirt",
-        description: "Comfortable cotton tee",
-        price: 2500,
-        image_url: "https://via.placeholder.com/400x300?text=White+T-Shirt",
-        category: "T-Shirts",
-        stock: 20,
-      },
-      {
-        name: "Black Hoodie",
-        description: "Warm fleece hoodie",
-        price: 8000,
-        image_url: "https://via.placeholder.com/400x300?text=Black+Hoodie",
-        category: "Hoodies",
-        stock: 12,
-      },
-      {
-        name: "Sneakers",
-        description: "Lightweight running shoes",
-        price: 15000,
-        image_url: "https://via.placeholder.com/400x300?text=Sneakers",
-        category: "Shoes",
-        stock: 8,
-      },
-      {
-        name: "Denim Jeans",
-        description: "Slim fit jeans",
-        price: 7000,
-        image_url: "https://via.placeholder.com/400x300?text=Denim+Jeans",
-        category: "Pants",
+        name: "Egyptian Black Abaya",
+        description:
+          "Elegant flowing abaya made from premium Egyptian cotton with intricate embroidery",
+        price: 8500,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Egyptian+Black+Abaya",
+        category: "Abaya",
         stock: 15,
       },
       {
-        name: "Cap",
-        description: "Baseball cap",
-        price: 1200,
-        image_url: "https://via.placeholder.com/400x300?text=Cap",
-        category: "Accessories",
+        name: "Dubai Luxury Abaya",
+        description:
+          "Premium Dubai-style abaya with beautiful stone work and modern cut",
+        price: 12000,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Dubai+Luxury+Abaya",
+        category: "Abaya",
+        stock: 10,
+      },
+      {
+        name: "Traditional Jallabiya",
+        description:
+          "Comfortable traditional jallabiya perfect for daily wear and prayers",
+        price: 4500,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Traditional+Jallabiya",
+        category: "Jallabiya",
+        stock: 20,
+      },
+      {
+        name: "Ankara Print Dress",
+        description: "Vibrant African Ankara print dress with modern tailoring",
+        price: 6500,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Ankara+Print+Dress",
+        category: "Ankara",
+        stock: 18,
+      },
+      {
+        name: "French Lace Kaftan",
+        description: "Elegant French lace kaftan with beautiful patterns",
+        price: 7500,
+        image_url:
+          "https://via.placeholder.com/400x300?text=French+Lace+Kaftan",
+        category: "Laces",
+        stock: 12,
+      },
+      {
+        name: "Kampala Cotton Set",
+        description: "High-quality Kampala cotton traditional wear set",
+        price: 5500,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Kampala+Cotton+Set",
+        category: "Kampala",
+        stock: 16,
+      },
+      {
+        name: "Shedda Traditional Dress",
+        description:
+          "Beautiful shedda with traditional patterns and comfortable fit",
+        price: 4800,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Shedda+Traditional+Dress",
+        category: "Shedda",
+        stock: 14,
+      },
+      {
+        name: "Premium Chiffon Veil",
+        description:
+          "Lightweight chiffon veil with elegant drape and quality finish",
+        price: 2200,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Premium+Chiffon+Veil",
+        category: "Veils",
+        stock: 25,
+      },
+      {
+        name: "Silk Square Hijab",
+        description:
+          "High-quality silk hijab with beautiful texture and color options",
+        price: 1800,
+        image_url: "https://via.placeholder.com/400x300?text=Silk+Square+Hijab",
+        category: "Hijab",
         stock: 30,
+      },
+      {
+        name: "Traditional Prayer Cap",
+        description: "Comfortable prayer cap made from breathable cotton",
+        price: 1200,
+        image_url:
+          "https://via.placeholder.com/400x300?text=Traditional+Prayer+Cap",
+        category: "Caps",
+        stock: 35,
       },
     ];
 

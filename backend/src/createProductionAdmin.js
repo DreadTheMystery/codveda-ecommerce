@@ -4,7 +4,9 @@ const User = require("./models/user");
 
 async function createProductionAdmin() {
   console.log("🚀 Creating Admin Account for Production");
-  console.log("This will create your admin account on the production database\n");
+  console.log(
+    "This will create your admin account on the production database\n"
+  );
 
   const uri = process.env.MONGO_URI;
   if (!uri) {
@@ -39,7 +41,7 @@ async function createProductionAdmin() {
       console.log(`📧 Email: ${existingAdmin.email}`);
       console.log(`👤 Name: ${existingAdmin.name}`);
       console.log(`🔑 Role: ${existingAdmin.role}`);
-      
+
       // Update password to ensure it's correct
       existingAdmin.password = adminData.password;
       await existingAdmin.save();

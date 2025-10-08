@@ -1,7 +1,7 @@
 {
   "name": "codveda-ecommerce",
   "version": "1.0.0",
-  "description": "CodVeda E-commerce Full-Stack Application",
+  "description": "CodVeda Islamic & African Fashion E-commerce Platform",
   "main": "backend/src/app.js",
   "scripts": {
     "start": "node backend/src/app.js",
@@ -20,6 +20,11 @@
   },
   "keywords": [
     "ecommerce",
+    "islamic-fashion",
+    "african-fashion",
+    "abaya",
+    "hijab",
+    "ankara",
     "react",
     "nodejs",
     "mongodb",
