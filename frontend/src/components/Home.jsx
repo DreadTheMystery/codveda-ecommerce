@@ -194,7 +194,7 @@ const Home = () => {
 
   // Add to cart function
   const addToCart = (productId) => {
-    const product = allProducts.find((p) => p._id === productId);
+    const product = allProducts.find((p) => p.id === productId);
     if (!product) {
       showNotification("Product not found", "error", "❌ Product Error");
       return;
@@ -210,7 +210,7 @@ const Home = () => {
     }
 
     // Check if adding one more would exceed stock
-    const currentQuantity = getItemQuantity(product._id);
+    const currentQuantity = getItemQuantity(product.id);
 
     if (currentQuantity >= product.stock) {
       showNotification(
@@ -414,7 +414,7 @@ const Home = () => {
       const requestData = {
         items: [
           {
-            product: orderData.product._id,
+            product: orderData.product.id,
             quantity: orderData.quantity,
           },
         ],
@@ -738,7 +738,7 @@ const Home = () => {
             {!loading &&
               filteredProducts.map((product) => (
                 <div
-                  key={product._id}
+                  key={product.id}
                   className="card"
                   data-category={product.category || "Uncategorized"}
                 >
@@ -781,7 +781,7 @@ const Home = () => {
                       <button
                         className="add-to-cart"
                         disabled={product.stock < 1}
-                        onClick={() => addToCart(product._id)}
+                        onClick={() => addToCart(product.id)}
                       >
                         {product.stock < 1
                           ? "❌ Out of Stock"

@@ -173,7 +173,7 @@ const Cart = () => {
     try {
       const orderData = {
         items: cart.items.map((item) => ({
-          product: item.product._id,
+          product: item.product.id,
           quantity: item.quantity,
         })),
         shippingAddress,
@@ -193,7 +193,7 @@ const Cart = () => {
 
       if (response.ok) {
         showNotification(
-          `Order placed successfully! Order #${result.order._id.slice(-8)}`,
+          `Order placed successfully! Order #${result.order.id.slice(-8)}`,
           "order",
           "🎉 Order Confirmed!"
         );
@@ -270,7 +270,7 @@ const Cart = () => {
             </div>
 
             {cart.items.map((item) => (
-              <div key={item.product._id} className="cart-item">
+              <div key={item.product.id} className="cart-item">
                 <div className="item-image">
                   <img
                     src={
@@ -300,7 +300,7 @@ const Cart = () => {
                     <button
                       onClick={() =>
                         handleQuantityChange(
-                          item.product._id,
+                          item.product.id,
                           item.quantity - 1
                         )
                       }
@@ -312,7 +312,7 @@ const Cart = () => {
                     <button
                       onClick={() =>
                         handleQuantityChange(
-                          item.product._id,
+                          item.product.id,
                           item.quantity + 1
                         )
                       }
@@ -333,7 +333,7 @@ const Cart = () => {
                   <button
                     className="remove-item-btn"
                     onClick={() =>
-                      handleRemoveItem(item.product._id, item.product.name)
+                      handleRemoveItem(item.product.id, item.product.name)
                     }
                   >
                     🗑️ Remove

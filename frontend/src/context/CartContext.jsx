@@ -17,7 +17,7 @@ const cartReducer = (state, action) => {
     case CART_ACTIONS.ADD_ITEM: {
       const { product, quantity = 1 } = action.payload;
       const existingItem = state.items.find(
-        (item) => item.product._id === product._id
+        (item) => item.product.id === product.id
       );
 
       if (existingItem) {
@@ -29,7 +29,7 @@ const cartReducer = (state, action) => {
         return {
           ...state,
           items: state.items.map((item) =>
-            item.product._id === product._id
+            item.product.id === product.id
               ? { ...item, quantity: newQuantity }
               : item
           ),
@@ -51,13 +51,13 @@ const cartReducer = (state, action) => {
       if (quantity <= 0) {
         return {
           ...state,
-          items: state.items.filter((item) => item.product._id !== productId),
+          items: state.items.filter((item) => item.product.id !== productId),
         };
       }
       return {
         ...state,
         items: state.items.map((item) =>
-          item.product._id === productId
+          item.product.id === productId
             ? { ...item, quantity: Math.min(quantity, item.product.stock) }
             : item
         ),
@@ -68,7 +68,7 @@ const cartReducer = (state, action) => {
       const { productId } = action.payload;
       return {
         ...state,
-        items: state.items.filter((item) => item.product._id !== productId),
+        items: state.items.filter((item) => item.product.id !== productId),
       };
     }
 
@@ -143,12 +143,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const getItemQuantity = (productId) => {
-    const item = cart.items.find((item) => item.product._id === productId);
+    const item = cart.items.find((item) => item.product.id === productId);
     return item ? item.quantity : 0;
   };
 
   const isInCart = (productId) => {
-    return cart.items.some((item) => item.product._id === productId);
+    return cart.items.some((item) => item.product.id === productId);
   };
 
   const value = {

@@ -1,7 +1,8 @@
 // API Configuration for Production and Development
 export const API_CONFIG = {
-  // Use environment variable or fallback to production backend
-  BASE_URL: import.meta.env.VITE_API_URL || "https://nafsykay.onrender.com",
+  // Use environment variable, fallback to localhost in dev, or production backend
+  BASE_URL: import.meta.env.VITE_API_URL || 
+           (import.meta.env.DEV ? "http://localhost:4001" : "https://nafsykay.onrender.com"),
 
   // API endpoints
   ENDPOINTS: {

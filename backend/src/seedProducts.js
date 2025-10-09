@@ -8,7 +8,7 @@ async function seedProducts() {
   try {
     await testConnection();
     await sequelize.sync({ force: false });
-    
+
     const sampleProducts = [
       {
         name: "Classic T-Shirt",
@@ -16,7 +16,7 @@ async function seedProducts() {
         price: 25.99,
         image_url: "/images/products/tshirt.jpg",
         category: "Clothing",
-        stock: 100
+        stock: 100,
       },
       {
         name: "Denim Jeans",
@@ -24,15 +24,15 @@ async function seedProducts() {
         price: 89.99,
         image_url: "/images/products/jeans.jpg",
         category: "Clothing",
-        stock: 75
+        stock: 75,
       },
       {
         name: "Summer Dress",
         description: "Light and breezy summer dress for women",
-        price: 45.50,
+        price: 45.5,
         image_url: "/images/products/dress.jpg",
         category: "Clothing",
-        stock: 50
+        stock: 50,
       },
       {
         name: "Sneakers",
@@ -40,7 +40,7 @@ async function seedProducts() {
         price: 79.99,
         image_url: "/images/products/sneakers.jpg",
         category: "Footwear",
-        stock: 60
+        stock: 60,
       },
       {
         name: "Leather Jacket",
@@ -48,17 +48,17 @@ async function seedProducts() {
         price: 199.99,
         image_url: "/images/products/leather-jacket.jpg",
         category: "Outerwear",
-        stock: 25
-      }
+        stock: 25,
+      },
     ];
 
     console.log("🌱 Starting to seed products...");
-    
+
     for (const productData of sampleProducts) {
-      const existingProduct = await Product.findOne({ 
-        where: { name: productData.name } 
+      const existingProduct = await Product.findOne({
+        where: { name: productData.name },
       });
-      
+
       if (!existingProduct) {
         await Product.create(productData);
         console.log(`✅ Created product: ${productData.name}`);

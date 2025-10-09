@@ -265,7 +265,7 @@ const Admin = () => {
                   <p>No contact messages yet.</p>
                 ) : (
                   contacts.map((contact) => (
-                    <div key={contact._id} className="contact-item">
+                    <div key={contact.id} className="contact-item">
                       <div className="contact-header">
                         <strong>{contact.name}</strong>
                         <span className="contact-email">{contact.email}</span>
