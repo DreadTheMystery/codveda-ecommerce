@@ -16,9 +16,13 @@ const User = sequelize.define(
       unique: true,
       validate: {
         isEmail: true,
+        notEmpty: true,
       },
       set(value) {
-        this.setDataValue("email", value.toLowerCase().trim());
+        // Ensure we never set empty or null email
+        if (value && typeof value === 'string') {
+          this.setDataValue("email", value.toLowerCase().trim());
+        }
       },
     },
     password: {
