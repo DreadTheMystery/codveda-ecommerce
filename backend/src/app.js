@@ -105,15 +105,19 @@ async function start() {
 
     // Sync database models (creates tables if they don't exist)
     // Use force: false and alter: false in production to avoid migration issues
-    const syncOptions = process.env.NODE_ENV === 'production' 
-      ? { force: false, alter: false }
-      : { alter: true };
-    
+    const syncOptions =
+      process.env.NODE_ENV === "production"
+        ? { force: false, alter: false }
+        : { alter: true };
+
     try {
       await sequelize.sync(syncOptions);
       console.log("✅ Database synchronized successfully.");
     } catch (syncError) {
-      console.warn("⚠️ Database sync failed, trying with force: false:", syncError.message);
+      console.warn(
+        "⚠️ Database sync failed, trying with force: false:",
+        syncError.message
+      );
       // Fallback: try without altering existing tables
       await sequelize.sync({ force: false, alter: false });
       console.log("✅ Database synchronized with fallback method.");

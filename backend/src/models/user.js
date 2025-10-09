@@ -20,7 +20,7 @@ const User = sequelize.define(
       },
       set(value) {
         // Ensure we never set empty or null email
-        if (value && typeof value === 'string') {
+        if (value && typeof value === "string") {
           this.setDataValue("email", value.toLowerCase().trim());
         }
       },
