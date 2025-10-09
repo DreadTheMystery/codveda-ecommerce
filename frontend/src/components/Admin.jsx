@@ -62,14 +62,11 @@ const Admin = () => {
   const handleViewContacts = async () => {
     try {
       const token = localStorage.getItem("adminToken");
-      const response = await fetch(
-        getApiUrl("/api/contact"),
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(getApiUrl("/api/contact"), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const contactsData = await response.json();
