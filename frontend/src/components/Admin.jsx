@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getApiUrl, API_CONFIG } from "../config/api";
 import "./Admin.css";
 
 const Admin = () => {
@@ -19,7 +20,7 @@ const Admin = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        getApiUrl(API_CONFIG.ENDPOINTS.AUTH + "/login"),
         {
           method: "POST",
           headers: {
@@ -62,7 +63,7 @@ const Admin = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/contact`,
+        getApiUrl("/api/contact"),
         {
           headers: {
             Authorization: `Bearer ${token}`,
