@@ -2,7 +2,7 @@
 export const API_CONFIG = {
   // Use environment variable, fallback to localhost in dev, or production backend
   BASE_URL: import.meta.env.VITE_API_URL || 
-           (import.meta.env.DEV ? "http://localhost:4001" : "https://nafsykay.onrender.com"),
+           (import.meta.env.DEV ? "http://localhost:4001" : "https://nafsykaybackend.onrender.com"),
 
   // API endpoints
   ENDPOINTS: {
